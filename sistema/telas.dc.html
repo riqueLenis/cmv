@@ -1,0 +1,1341 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Sistema Estoque &amp; CMV</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Space+Grotesk:wght@500;600;700&amp;family=JetBrains+Mono:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#eef1f5}
+a{color:#16324f}a:hover{color:#0b1c30}
+*{box-sizing:border-box}
+.app{font-family:Inter,system-ui,sans-serif;color:#0b1c30;display:flex;flex-wrap:wrap;min-height:100vh;background:#eef1f5;font-variant-numeric:tabular-nums}
+.side{flex:1 1 240px;background:#0b1c30;color:#fff;padding:22px 14px;display:flex;flex-direction:column;gap:16px}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px 12px;border-bottom:1px solid #1d3352}
+.mark{width:40px;height:40px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:#0b1c30}
+.grp{display:flex;flex-direction:column;gap:2px}
+.grp-l{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;font-weight:600;color:#8ea0b6;padding:0 10px 6px;text-transform:uppercase}
+.nav{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:38px;padding:0 12px;border-radius:8px;font-size:13.5px;font-weight:500;color:#c7d2e0;font-family:Inter,system-ui,sans-serif}
+.nav:hover{background:#13294a;color:#fff}
+.nav:focus-visible{outline:2px solid #9fbbe0}
+.nav.on{background:#ffffff;color:#0b1c30;font-weight:700}
+.nav .dot{width:6px;height:6px;border-radius:3px;background:#2e4a70;flex:none}
+.nav.on .dot{background:#0b1c30}
+.main{flex:999 1 560px;min-width:0;display:flex;flex-direction:column}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:14px 32px;background:#ffffff;border-bottom:1px solid #dde2ea}
+.page{padding:28px 32px 56px;display:flex;flex-direction:column;gap:22px;max-width:1280px;width:100%}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.12em;color:#2b4a6d;text-transform:uppercase}
+.h1{margin:2px 0 0;font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;letter-spacing:-.02em;color:#0b1c30}
+.sub{margin:4px 0 0;color:#5b6676;font-size:14px;line-height:1.5}
+.h2{margin:0 0 14px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.1em;color:#0b1c30}
+.h2::before{content:"";width:8px;height:8px;border-radius:2px;background:#16324f}
+.card{background:#fff;border:1px solid #dde2ea;border-radius:14px;padding:20px}
+.cream{background:#f6f8fb;border:1px solid #dde2ea;border-left-width:1px;border-radius:12px;padding:12px 16px;font-size:13px;color:#3d4a5c;line-height:1.55}
+.cream b{color:#0b1c30}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px}
+.kpi{background:#fff;border:1px solid #dde2ea;border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.kpi.dark{background:#0b1c30;border-color:#0b1c30;color:#fff}
+.kl{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#5b6676}
+.kpi.dark .kl{color:#9fb2c9}
+.kv{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;letter-spacing:-.02em;color:#0b1c30}
+.kpi.dark .kv{color:#fff}
+.ks{font-size:12px;color:#5b6676}
+.kpi.dark .ks{color:#c7d2e0}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;white-space:nowrap;letter-spacing:.04em;border:1px solid transparent}
+.ok{background:#e4ecf6;color:#16324f;border-color:#c7d6e8}
+.warn{background:#fbe9e9;color:#8f1d1d;border-color:#f1c9c9}
+.bad{background:#8f1d1d;color:#fff;border-color:#8f1d1d}
+.mute{background:#eef1f5;color:#475569;border-color:#dde2ea}
+.kpi.dark .ok{background:#1d3352;color:#dce6f2;border-color:#2e4a70}
+.kpi.dark .warn{background:#5a1c1c;color:#ffd9d9;border-color:#7a2a2a}
+.kpi.dark .mute{background:#1d3352;color:#c7d2e0;border-color:#2e4a70}
+.tblw{overflow-x:auto;border:1px solid #dde2ea;border-radius:12px;background:#fff}
+.tblw.tall{max-height:620px;overflow-y:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{background:#16324f;color:#fff;text-align:left;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:10px;white-space:nowrap;position:sticky;top:0;z-index:1}
+th.r,td.r{text-align:right}
+td.r{font-family:'JetBrains Mono',monospace;font-size:12.5px}
+th.fill{background:#dce6f2;color:#0b1c30}
+th.grpH{background:#0b1c30;color:#fff;text-align:center}
+td{padding:7px 10px;border-top:1px solid #edf0f4;white-space:nowrap;color:#1f2a3a}
+tr:nth-child(even) td{background:#f8f9fb}
+tbody tr:hover td{background:#eef3f9}
+td.code{color:#5b6676;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:12px}
+td.b{font-weight:700;color:#0b1c30}
+td.neg{color:#8f1d1d;font-weight:700}
+td.grow{background:#dce6f2 !important;color:#0b1c30;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:8px 10px}
+.sheet td.grow{background:#e8edf3 !important;font-family:Inter,sans-serif}
+tfoot td{background:#eef1f5 !important;font-weight:700;color:#0b1c30;position:sticky;bottom:0;border-top:1px solid #c7d0dc}
+.inp{font-family:Inter,system-ui,sans-serif;font-size:13px;border:1px solid #b9cfe8;background:#e8f1fb;border-radius:7px;padding:0 9px;min-height:32px;color:#0b1c30;width:100%}
+.inp::placeholder{color:#6b7a8f}
+.inp[readonly]{background:#f3f6fa;border-color:#d5dde8}
+.inp:focus{outline:none;border-color:#16324f;box-shadow:0 0 0 3px rgba(22,50,79,.18)}
+.inp.num{width:80px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:12.5px}
+.inp.wide{min-width:200px}
+.fld{display:flex;flex-direction:column;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;color:#475569;letter-spacing:.08em;text-transform:uppercase}
+.btn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:10px;background:#16324f;color:#fff;font-weight:700;font-size:14px;font-family:Inter,system-ui,sans-serif;transition:transform .08s,background .15s}
+.btn:hover{background:#0b1c30}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible{outline:2px solid #16324f;outline-offset:2px}
+.btn.sec{background:#fff;color:#0b1c30;border:1px solid #c3ccd8}
+.btn.sec:hover{background:#eef1f5}
+.lnk{all:unset;cursor:pointer;font-weight:600;color:#16324f;text-decoration:underline;text-underline-offset:3px;font-family:Inter,system-ui,sans-serif}
+.lnk:hover{color:#0b1c30}
+.row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+.bar-t{height:8px;border-radius:4px;background:#e6eaf0;overflow:hidden;min-width:60px}
+.bar-f{height:100%;border-radius:4px;background:#16324f}
+.bar-f.o{background:#6d87a8}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{all:unset;cursor:pointer;min-height:36px;padding:0 14px;border-radius:8px;border:1px solid #c3ccd8;font-size:13px;font-weight:600;display:flex;align-items:center;font-family:Inter,system-ui,sans-serif;background:#fff;color:#3d4a5c}
+.chip:hover{border-color:#16324f;color:#0b1c30}
+.chip.on{background:#0b1c30;border-color:#0b1c30;color:#fff}
+.mini{display:grid;grid-template-columns:1fr auto;gap:0;font-size:13px;color:#3d4a5c}
+.mini > div{padding:8px 0;border-top:1px solid #edf0f4}
+.mini > div:nth-child(-n+2){border-top:0}
+.mini .v{text-align:right;font-weight:700;color:#0b1c30;font-family:'JetBrains Mono',monospace;font-size:12.5px}
+.chart{display:flex;align-items:flex-end;gap:18px;height:200px;padding:0 4px;position:relative;border-bottom:1px solid #c7d0dc}
+.cb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;height:100%}
+.cbv{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#0b1c30}
+.cbar{width:100%;max-width:64px;border-radius:6px 6px 0 0;background:#16324f}
+.cbar.o{background:#8f1d1d}
+.cbar.e{background:#e6eaf0}
+.metal{position:absolute;left:0;right:0;border-top:1px dashed #0b1c30}
+.metat{position:absolute;right:0;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;color:#0b1c30;background:#fff;padding:0 4px;transform:translateY(-120%)}
+.clab{display:flex;gap:18px;padding:8px 4px 0}
+.clab div{flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:#5b6676}
+.step{display:grid;grid-template-columns:36px 180px 1fr auto;gap:14px;align-items:center;padding:12px 0;border-top:1px solid #edf0f4}
+.step:first-of-type{border-top:0}
+.stepn{width:32px;height:32px;border-radius:8px;background:#0b1c30;color:#fff;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center}
+.photo{border-radius:12px;background:#f3f6fa;border:1px dashed #b9c5d4;min-height:200px;display:flex;align-items:center;justify-content:center;color:#5b6676;font-size:13px;font-weight:600;flex-direction:column;gap:8px}
+.fr{border:1px solid #dde2ea;border-radius:12px;background:#fff;overflow:hidden;display:flex;flex-direction:column}
+.fr-h{background:#16324f;color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.fr table td{padding:6px 12px}
+.sw{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:8px;border:1px solid #b9cfe8}
+.blk{background:#0b1c30;color:#fff;border-radius:12px 12px 0 0;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:12px;letter-spacing:.04em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+select.inp{min-height:44px;font-weight:600}
+.ordb{all:unset;cursor:pointer;width:28px;height:28px;border-radius:6px;border:1px solid #c3ccd8;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;background:#fff;color:#16324f}
+.ordb:hover{background:#eef1f5}
+.mstep{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;padding:12px 0;border-top:1px solid #edf0f4}
+.mstep:first-of-type{border-top:0}
+.mphoto{width:120px;height:120px;border-radius:10px;background:#f3f6fa;border:1px dashed #b9c5d4;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;cursor:pointer;position:relative;overflow:hidden;font-size:11px;font-weight:600;color:#5b6676;text-align:center;flex:none}
+.mphoto:hover{border-color:#16324f}
+.mphoto img{width:100%;height:100%;object-fit:cover}
+.mitem{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid #dde2ea;border-radius:8px;font-size:13.5px;font-weight:600;font-family:Inter,system-ui,sans-serif;color:#1f2a3a;background:#fff}
+.mitem:hover{border-color:#16324f}
+.mitem.on{background:#0b1c30;border-color:#0b1c30;color:#fff}
+.mitem.on .pill{background:#1d3352;color:#dce6f2;border-color:#2e4a70}
+.toast{position:fixed;right:24px;bottom:24px;z-index:50;max-width:420px;background:#0b1c30;color:#fff;border-radius:12px;padding:14px 16px;font-size:13px;line-height:1.5;box-shadow:0 10px 40px rgba(11,28,48,.35);display:flex;gap:10px;align-items:flex-start}
+.toast .ic{width:22px;height:22px;border-radius:11px;background:#fff;color:#0b1c30;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none;font-size:13px}
+.pv{position:fixed;inset:0;z-index:60;background:rgba(11,28,48,.7);display:flex;flex-direction:column;align-items:center;overflow-y:auto;padding:24px 16px}
+.pv-bar{width:100%;max-width:820px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;color:#fff}
+.pv-bar .eyebrow{color:#c7d2e0}
+.sheet{width:100%;max-width:820px;background:#ffffff;color:#111827;border-radius:6px;padding:36px 40px;font-family:Inter,system-ui,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.sheet h3{margin:0;font-family:'Space Grotesk',sans-serif;font-size:24px;color:#0b1c30}
+.sheet .sh{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#16324f;margin:22px 0 8px;font-weight:600;border-bottom:2px solid #16324f;padding-bottom:4px}
+.sheet table{font-size:12px}
+.sheet th{background:#0b1c30;color:#fff;position:static;font-family:Inter,sans-serif}
+.sheet td{color:#111827;border-top:1px solid #e5e7eb;font-family:Inter,sans-serif}
+.sheet td.r{font-family:Inter,sans-serif}
+.pv-info{color:#dce6f2;font-size:13px;max-width:900px;width:100%;margin:-4px 0 12px}
+.sheet.mpg{max-width:900px;padding:28px 30px;break-after:page;page-break-after:always}
+.sheet .meta{display:flex;gap:24px;flex-wrap:wrap;font-size:13px;color:#374151;margin-top:6px}
+@media print{.side,.top,.page,.pv-bar,.pv-info,.toast{display:none !important}.pv{position:static;background:#fff;padding:0}.sheet{box-shadow:none;max-width:none;padding:0}.app{background:#fff}}
+</style>
+</helmet>
+<div class="app">
+
+<nav class="side" aria-label="Menu principal">
+  <div class="brand" style="flex-direction: column; align-items: flex-start; gap: 8px">
+    <img src="/_blob/782c0d9d9871409c3b583dd7eb890642" alt="João Gustavo Consultoria Empresarial Food Service" style="width: 100%; max-width: 200px; height: auto; display: block">
+    <div style="font-size: 12px; color: #9fb2c9">Controle de Estoque &amp; CMV</div>
+  </div>
+  <sc-for list="{{groups}}" as="g" hint-placeholder-count="5">
+    <div class="grp">
+      <div class="grp-l">{{g.label}}</div>
+      <sc-for list="{{g.items}}" as="it" hint-placeholder-count="3">
+        <button class="{{it.cls}}" onClick="{{it.go}}"><span class="dot"></span>{{it.label}}</button>
+      </sc-for>
+    </div>
+  </sc-for>
+  <div style="margin-top: auto; padding: 14px 10px 0; border-top: 1px solid #1d3352; display: flex; flex-direction: column; gap: 8px">
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; color: #8ea0b6; text-transform: uppercase">Método desenvolvido por</div>
+    <img src="/_blob/782c0d9d9871409c3b583dd7eb890642" alt="João Gustavo Consultoria Empresarial Food Service" style="width: 150px; height: auto; display: block; opacity: 0.9">
+    <div style="font-size: 11px; color: #8ea0b6; line-height: 1.5">Versão V12.1 · {{saveInfo}}</div>
+  </div>
+</nav>
+
+<main class="main">
+  <div class="top">
+    <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap">
+      <div style="font-weight: 800; font-size: 15px">{{cfg.nome}}</div>
+      <span class="pill mute">Mês de referência: {{cfg.mes}}</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 12px; color: #475569; font-weight: 700">
+      <span><span class="sw" style="background: #e8f1fb"></span>Você preenche</span>
+      <span><span class="sw" style="background: #ffffff; border-color: #c3ccd8"></span>Automático</span>
+    </div>
+  </div>
+
+  <!-- ===================== COMO USAR ===================== -->
+  <sc-if value="{{is.como}}" hint-placeholder-val="{{ true }}">
+  <div class="page">
+    <div>
+      <div class="eyebrow">JG Consultoria · Versão V12.1</div>
+      <h1 class="h1">Controle de Estoque &amp; CMV</h1>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h2 class="h2">Dados da empresa e do mês</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; align-items: end">
+          <label class="fld" style="grid-column: span 2">Nome do restaurante<input class="inp" style="min-height: 44px" value="{{cfg.nomeStr}}" onChange="{{cfg.onNome}}" placeholder="Nome que sai no topo e nas impressões"></label>
+          <label class="fld">Mês de referência<input class="inp" style="min-height: 44px" value="{{cfg.mesStr}}" onChange="{{cfg.onMes}}" placeholder="Ex.: Outubro 2026"></label>
+          <label class="fld">Meta de CMV do mês<input class="inp" style="min-height: 44px" value="{{cfg.metaMesStr}}" onChange="{{cfg.onMeta}}" placeholder="35%"></label>
+        </div>
+        <p class="sub" style="font-size: 12px">A meta de cada semana fica no CMV da semana; a do CMC fica na tela CMC compras.</p>
+      </div>
+      <div class="card">
+        <h2 class="h2">Seus dados</h2>
+        <div class="cream"><b>{{dados.info}}.</b> Tudo o que é digitado fica gravado sozinho neste computador e neste navegador. Baixe um backup de vez em quando e sempre antes de trocar de computador ou limpar o navegador.</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px">
+          <button class="btn" onClick="{{dados.backup}}">Baixar backup</button>
+          <label class="btn sec" style="position: relative">Restaurar backup<input type="file" accept=".json,application/json" onChange="{{dados.restaurar}}" aria-label="Escolher arquivo de backup" style="position: absolute; width: 1px; height: 1px; opacity: 0"></label>
+          <button class="btn sec" onClick="{{dados.novoMes}}">Iniciar novo mês</button>
+        </div>
+        <p class="sub" style="font-size: 12px">Dados iniciais importados de: {{dados.origem}} · <button class="lnk" style="color: #8f1d1d; font-size: 12px" onClick="{{dados.zerar}}">voltar aos dados da planilha</button></p>
+      </div>
+    </div>
+    <div class="card">
+      <h2 class="h2">Como usar este sistema</h2>
+      <sc-for list="{{steps}}" as="s" hint-placeholder-count="13">
+        <div class="step">
+          <div class="stepn">{{s.n}}</div>
+          <div style="font-weight: 800; font-size: 13px">{{s.t}}</div>
+          <div style="font-size: 13px; color: #475569; line-height: 1.5">{{s.d}}</div>
+          <button class="lnk" onClick="{{s.go}}">Abrir</button>
+        </div>
+      </sc-for>
+    </div>
+    <div class="card">
+      <h2 class="h2">Legenda</h2>
+      <div class="mini" style="max-width: 760px">
+        <div><span class="sw" style="background: #e8f1fb"></span><b>Campo azul-claro</b></div><div class="v" style="font-weight: 600">Você preenche</div>
+        <div><span class="sw" style="background: #ffffff; border-color: #c3ccd8"></span><b>Campo branco / cinza</b></div><div class="v" style="font-weight: 600">Calculado automaticamente. Não dá para digitar por cima.</div>
+        <div><b>Unidades kg e L</b></div><div class="v" style="font-weight: 600; white-space: normal">Nas fichas técnicas, a quantidade usada é em gramas / ml (o sistema converte). Em und, cx e pct é por unidade.</div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== CADASTRO ===================== -->
+  <sc-if value="{{is.cad}}" hint-placeholder-val="{{ false }}">
+  <div class="page">
+    <div>
+      <h1 class="h1">Cadastro de insumos</h1>
+      <p class="sub">Base de preços de todo o controle</p>
+    </div>
+    <div class="cream">Preencha os campos azul-claros. Valor unit. = valor de compra ÷ quantidade que rende. O CÓD de cada linha é fixo: pode <b>renomear à vontade</b> que todas as telas acompanham. <b>A ordem do cadastro é a ordem da Lista de contagem e do CMV</b>: item novo entra na posição que você escolher (ou use ↑ ↓) e tudo o que já foi lançado continua com o seu item, porque fica preso ao CÓD, não à linha. <b>NA CONTAGEM? = Não</b> tira o item da lista de contagem (no CMV ele continua, no fim da tabela). Item que já tem lançamento não pode ser excluído: renomeie para "(INATIVO) ...".</div>
+
+    <div class="card">
+      <h2 class="h2">Novo insumo</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; align-items: end">
+        <label class="fld" style="grid-column: span 2">Produto<input class="inp" style="min-height: 44px" value="{{novo.nome}}" onChange="{{novo.onNome}}" placeholder="Nome do insumo"></label>
+        <label class="fld">Unid<select class="inp" value="{{novo.un}}" onChange="{{novo.onUn}}"><sc-for list="{{unOpts}}" as="u" hint-placeholder-count="7"><option value="{{u.v}}">{{u.v}}</option></sc-for></select></label>
+        <label class="fld">Qtd que rende<input class="inp" style="min-height: 44px" value="{{novo.rende}}" onChange="{{novo.onRende}}"></label>
+        <label class="fld">Valor de compra<input class="inp" style="min-height: 44px" value="{{novo.compra}}" onChange="{{novo.onCompra}}" placeholder="R$"></label>
+        <label class="fld">Categoria<select class="inp" value="{{novo.cat}}" onChange="{{novo.onCat}}"><sc-for list="{{catNames}}" as="c" hint-placeholder-count="6"><option value="{{c.nome}}">{{c.nome}}</option></sc-for></select></label>
+        <label class="fld" style="grid-column: span 2">Posição na contagem e no CMV<select class="inp" value="{{novo.after}}" onChange="{{novo.onAfter}}"><option value="">No fim da lista</option><option value="__top">No topo da lista</option><sc-for list="{{posOpts}}" as="o" hint-placeholder-count="10"><option value="{{o.v}}">Depois de {{o.label}}</option></sc-for></select></label>
+        <button class="btn" onClick="{{novo.add}}">Cadastrar insumo</button>
+      </div>
+      <sc-if value="{{novo.hasMsg}}" hint-placeholder-val="{{ false }}"><p class="sub" style="color: #16324f; font-weight: 700">{{novo.msg}}</p></sc-if>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+      <div style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+        <div class="chips" role="group" aria-label="Filtrar por categoria">
+          <sc-for list="{{catChips}}" as="c" hint-placeholder-count="7">
+            <button class="{{c.cls}}" onClick="{{c.pick}}">{{c.nome}}</button>
+          </sc-for>
+        </div>
+        <div class="tblw tall">
+          <table>
+            <thead><tr><th>Ordem</th><th>CÓD</th><th class="fill">Produto</th><th class="fill">Unid</th><th class="r fill">Qtd que rende</th><th class="r fill">Valor de compra</th><th class="r">Valor unit. (pós-rendimento)</th><th class="fill">Categoria</th><th>Entra no CMV?</th><th class="fill">Na contagem?</th><th></th></tr></thead>
+            <tbody>
+              <sc-for list="{{cadRows}}" as="r" hint-placeholder-count="12">
+                <tr>
+                  <td><div style="display: flex; gap: 4px; align-items: center"><span style="width: 24px; font-weight: 800; color: #5b6676">{{r.pos}}</span><button class="ordb" onClick="{{r.up}}" aria-label="Subir {{r.nome}}">↑</button><button class="ordb" onClick="{{r.down}}" aria-label="Descer {{r.nome}}">↓</button></div></td>
+                  <td class="code">{{r.cod}}</td>
+                  <td><input class="inp wide" value="{{r.nome}}" onChange="{{r.onNome}}" aria-label="Produto {{r.cod}}"></td>
+                  <td><select class="inp" style="width: 76px" value="{{r.un}}" onChange="{{r.onUn}}" aria-label="Unidade {{r.cod}}"><sc-for list="{{unOpts}}" as="u" hint-placeholder-count="7"><option value="{{u.v}}">{{u.v}}</option></sc-for></select></td>
+                  <td class="r"><input class="inp num" value="{{r.rende}}" onChange="{{r.onRende}}" aria-label="Quantidade que rende {{r.cod}}"></td>
+                  <td class="r"><input class="inp num" value="{{r.compra}}" onChange="{{r.onCompra}}" placeholder="R$" aria-label="Valor de compra {{r.cod}}"></td>
+                  <td class="{{r.unitCls}}">{{r.unitTxt}}</td>
+                  <td><select class="inp" style="min-width: 140px" value="{{r.cat}}" onChange="{{r.onCat}}" aria-label="Categoria {{r.cod}}"><sc-for list="{{catNames}}" as="c" hint-placeholder-count="6"><option value="{{c.nome}}">{{c.nome}}</option></sc-for></select></td>
+                  <td>{{r.cmvTxt}}</td>
+                  <td><select class="inp" style="width: 80px" value="{{r.naCont}}" onChange="{{r.onNaCont}}" aria-label="Na contagem {{r.cod}}"><option value="Sim">Sim</option><option value="Não">Não</option></select></td>
+                  <td><button class="lnk" style="color: #8f1d1d" onClick="{{r.del}}">Excluir</button></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+        <p class="sub" style="margin: 0">Capacidade: 300 insumos (CÓD 001 a 300).</p>
+      </div>
+      <div style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 14px">
+        <div class="kpi dark"><div class="kl">Itens cadastrados</div><div class="kv">{{nIns}}</div><div class="ks">{{nCont}} na lista de contagem · {{nFora}} fora da contagem</div></div>
+        <div class="card" style="padding: 16px">
+          <h2 class="h2">Categorias</h2>
+          <div class="tblw"><table>
+            <thead><tr><th class="fill">Categoria</th><th class="fill">Entra no CMV?</th></tr></thead>
+            <tbody>
+              <sc-for list="{{catCfg}}" as="c" hint-placeholder-count="6">
+                <tr><td class="b">{{c.nome}}</td><td><select class="inp" style="width: 80px" value="{{c.cmv}}" onChange="{{c.onCmv}}" aria-label="Entra no CMV {{c.nome}}"><option value="Sim">Sim</option><option value="Não">Não</option></select></td></tr>
+              </sc-for>
+            </tbody>
+          </table></div>
+          <div style="display: grid; grid-template-columns: 1fr 86px; gap: 8px; margin-top: 12px; align-items: end">
+            <label class="fld">Nova categoria<input class="inp" style="min-height: 44px" value="{{novaCat.nome}}" onChange="{{novaCat.onNome}}" placeholder="Ex.: Bebidas"></label>
+            <label class="fld">No CMV?<select class="inp" value="{{novaCat.cmv}}" onChange="{{novaCat.onCmv}}"><option value="Sim">Sim</option><option value="Não">Não</option></select></label>
+          </div>
+          <button class="btn sec" style="width: 100%; margin-top: 10px" onClick="{{novaCat.add}}">Adicionar categoria</button>
+          <p class="sub" style="font-size: 12px">A categoria nova aparece na hora no cadastro, no "Onde foi o dinheiro" do CMV, no Fechamento e no CMC.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== LISTA DE CONTAGEM ===================== -->
+  <sc-if value="{{is.lista}}" hint-placeholder-val="{{ false }}">
+  <div class="page">
+    <div class="row">
+      <div>
+        <h1 class="h1">Contagem de estoque</h1>
+        <p class="sub">Imprima e anote a quantidade</p>
+      </div>
+      <button class="btn" onClick="{{openLista}}">Imprimir lista</button>
+    </div>
+    <div class="cream">Esta lista é automática: mesmos nomes do cadastro. Escolha a <b>ordem</b> que combina com o jeito que o estoque é contado: ordem do cadastro, alfabética geral ou alfabética separada por categoria. <b>A mesma ordem vale para a digitação no CMV da semana</b>, então a pessoa digita na mesma sequência em que anotou. Item com NA CONTAGEM? = Não sai da lista.</div>
+    <div class="card" style="padding: 14px 18px; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center">
+      <span class="kl">Ordem da lista</span>
+      <div class="chips" role="group" aria-label="Ordem da lista"><sc-for list="{{ordChips}}" as="o" hint-placeholder-count="3"><button class="{{o.cls}}" onClick="{{o.pick}}">{{o.nome}}</button></sc-for></div>
+      <span class="sub" style="margin: 0; font-size: 12px">{{ordHint}}</span>
+    </div>
+
+    <div class="card" style="display: flex; gap: 32px; flex-wrap: wrap; font-weight: 700; font-size: 14px">
+      <span>Data: ____/____/________</span><span>Resp.: ______________________________</span>
+    </div>
+    <div class="tblw tall">
+      <table>
+        <thead><tr><th>Nº</th><th>Produto</th><th>Unid</th><th style="min-width: 160px">Qtde em estoque</th><th style="min-width: 220px">Observação</th></tr></thead>
+          <sc-for list="{{listaG}}" as="g" hint-placeholder-count="1"><tbody>
+            <sc-if value="{{g.hdr}}" hint-placeholder-val="{{ false }}"><tr><td colspan="5" class="grow">{{g.nome}} · {{g.n}} itens</td></tr></sc-if>
+            <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="12"><tr><td class="code">{{r.n}}</td><td class="b">{{r.nome}}</td><td>{{r.un}}</td><td></td><td></td></tr></sc-for>
+          </tbody></sc-for>
+      </table>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== PRODUÇÃO E ENTRADA ===================== -->
+  <sc-if value="{{is.prod}}" hint-placeholder-val="{{ false }}">
+  <div class="page">
+    <div>
+      <h1 class="h1">Lançamento de produção e entrada</h1>
+      <p class="sub">Lance pela data · o sistema manda sozinho para o CMV da semana certa, já somado por item</p>
+    </div>
+    <div class="cream">Escolha o <b>TIPO</b>: <b>Entrada</b> = mercadoria que chegou (nota, compra, transferência) · <b>Produção</b> = o que foi produzido na casa. <b>A semana é encontrada pela DATA</b>: entra no CMV da semana tudo o que foi lançado <b>do dia da contagem inicial até o dia anterior à contagem final</b> (ex.: contagem inicial 01/10 e final 07/10 → pega de 01/10 até 06/10). As datas de cada semana ficam no CMV da semana.</div>
+    <div class="card" style="padding: 14px 18px">
+      <div style="display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; align-items: center">
+        <span class="kl">Períodos do CMV</span>
+        <sc-for list="{{periodos}}" as="p" hint-placeholder-count="5"><span><b>{{p.nome}}:</b> {{p.per}}</span></sc-for>
+      </div>
+    </div>
+    <div class="card">
+      <h2 class="h2">Novo lançamento</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; align-items: end">
+        <label class="fld">Tipo<select class="inp" value="{{form.tipo}}" onChange="{{form.onTipo}}"><option value="Entrada">Entrada</option><option value="Produção">Produção</option></select></label>
+        <label class="fld">Data<input class="inp" style="min-height: 44px" value="{{form.data}}" onChange="{{form.onData}}" placeholder="dd/mm/aaaa"></label>
+        <label class="fld" style="grid-column: span 2">Insumo / preparo<select class="inp" value="{{form.cod}}" onChange="{{form.onCod}}"><sc-for list="{{insOpts}}" as="o" hint-placeholder-count="10"><option value="{{o.v}}">{{o.label}}</option></sc-for></select></label>
+        <label class="fld">Qtde ({{form.un}})<input class="inp" style="min-height: 44px" value="{{form.qtd}}" onChange="{{form.onQtd}}"></label>
+        <label class="fld">Responsável / obs.<input class="inp" style="min-height: 44px" value="{{form.resp}}" onChange="{{form.onResp}}" placeholder="Nome ou nº da nota"></label>
+        <button class="btn" onClick="{{form.add}}">Lançar</button>
+      </div>
+      <p class="sub" style="font-size: 13px; font-weight: 600; color: #16324f">{{form.destino}}</p>
+    </div>
+    <div class="chips" role="group" aria-label="Semana">
+      <sc-for list="{{prodTabs}}" as="t" hint-placeholder-count="6"><button class="{{t.cls}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for>
+    </div>
+    <div class="row" style="align-items: center">
+      <div class="chips" role="group" aria-label="Filtrar tipo">
+        <sc-for list="{{tipoChips}}" as="c" hint-placeholder-count="3"><button class="{{c.cls}}" onClick="{{c.pick}}">{{c.nome}}</button></sc-for>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap"><span class="pill ok">Entradas: {{prodBlk.rsEnt}}</span><span class="pill mute">Produção: {{prodBlk.rsProd}}</span></div>
+    </div>
+    <div>
+      <div class="blk"><span>{{prodBlk.titulo}}</span><span>{{prodBlk.info}}</span></div>
+      <div class="tblw tall" style="border-radius: 0 0 12px 12px">
+        <table>
+          <thead><tr><th>Tipo</th><th>Data</th><th>Insumo / preparo</th><th>Unid</th><th class="r">Qtd rend.</th><th class="r">Qtde</th><th class="r">R$</th><th>Responsável / obs.</th><th>Vai para</th><th></th></tr></thead>
+          <tbody>
+            <sc-for list="{{prodBlk.rows}}" as="p" hint-placeholder-count="8">
+              <tr><td><span class="{{p.tipoCls}}">{{p.tipo}}</span></td><td>{{p.data}}</td><td class="b">{{p.label}}</td><td>{{p.un}}</td><td class="r">{{p.rende}}</td><td class="r b">{{p.qtd}}</td><td class="r">{{p.rs}}</td><td>{{p.resp}}</td><td><span class="{{p.semCls}}">{{p.semana}}</span></td><td><button class="lnk" style="color: #8f1d1d" onClick="{{p.del}}">Excluir</button></td></tr>
+            </sc-for>
+            <sc-if value="{{prodBlk.vazio}}" hint-placeholder-val="{{ false }}"><tr><td colspan="10" style="color: #5b6676; padding: 16px 10px">Nenhum lançamento aqui ainda.</td></tr></sc-if>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== RESUMO PRODUÇÃO / PERDAS (mesmo layout) ===================== -->
+  <sc-if value="{{is.rprod}}" hint-placeholder-val="{{ false }}">
+  <div class="page">
+    <div>
+      <h1 class="h1">Resumo da produção</h1>
+      <p class="sub">Soma automática por semana e total do mês · vem dos lançamentos tipo PRODUÇÃO da tela Produção e entrada · ranking por valor (R$)</p>
+    </div>
+    <div class="grid4">
+      <div class="kpi dark"><div class="kl">Total produzido no mês</div><div class="kv">{{rp.rsTotal}}</div><div class="ks">{{rp.total}} (soma das quantidades)</div></div>
+      <div class="kpi"><div class="kl">Lançamentos no mês</div><div class="kv">{{rp.lanc}}</div><div class="ks">linhas lançadas nas 5 semanas</div></div>
+      <div class="kpi"><div class="kl">Campeão do mês</div><div class="kv" style="font-size: 20px">{{rp.campeao}}</div><div class="ks">{{rp.campSub}}</div></div>
+      <div class="kpi"><div class="kl">Itens diferentes</div><div class="kv">{{rp.itens}}</div><div class="ks">itens com algo produzido no mês</div></div>
+    </div>
+    <div>
+      <h2 class="h2">Destaque de cada semana — o que mais foi produzido</h2>
+      <div class="tblw"><table>
+        <thead><tr><th>Semana</th><th>Item destaque</th><th class="r">Qtde</th><th>Unid</th><th class="r">R$ do item</th><th class="r">R$ da semana</th><th class="r">Lanç.</th><th class="r">% do mês</th></tr></thead>
+        <tbody><sc-for list="{{rp.dest}}" as="d" hint-placeholder-count="5"><tr><td class="b">{{d.sem}}</td><td>{{d.item}}</td><td class="r">{{d.qtd}}</td><td>{{d.un}}</td><td class="r">{{d.rsItem}}</td><td class="r b">{{d.rsSem}}</td><td class="r">{{d.lanc}}</td><td class="r">{{d.pct}}</td></tr></sc-for></tbody>
+        <tfoot><tr><td colspan="5">TOTAL DO MÊS</td><td class="r">{{rp.rsTotal}}</td><td class="r">{{rp.lanc}}</td><td class="r">100%</td></tr></tfoot>
+      </table></div>
+    </div>
+    <div>
+      <h2 class="h2">Ranking do mês — top 15</h2>
+      <div class="tblw"><table>
+        <thead><tr><th>Item</th><th>Unid</th><th class="r">Qtde mês</th><th class="r">R$ mês</th><th class="r">% do mês</th><th style="width: 30%">Peso no mês</th></tr></thead>
+        <tbody><sc-for list="{{rp.rank}}" as="r" hint-placeholder-count="3"><tr><td class="b">{{r.label}}</td><td>{{r.un}}</td><td class="r">{{r.qtd}}</td><td class="r b">{{r.rs}}</td><td class="r">{{r.pct}}</td><td><div class="bar-t"><div class="bar-f" style="width: {{r.w}}%"></div></div></td></tr></sc-for></tbody>
+      </table></div>
+    </div>
+    <div>
+      <h2 class="h2">Todos os itens — soma de cada semana e total do mês</h2>
+      <div class="tblw"><table>
+        <thead><tr><th>Item</th><th>Unid</th><th class="r">Sem 1</th><th class="r">Sem 2</th><th class="r">Sem 3</th><th class="r">Sem 4</th><th class="r">Sem 5</th><th class="r">Total mês</th><th class="r">R$ mês</th><th class="r">% mês</th></tr></thead>
+        <tbody><sc-for list="{{rp.all}}" as="r" hint-placeholder-count="3"><tr><td class="b">{{r.label}}</td><td>{{r.un}}</td><td class="r">{{r.s0}}</td><td class="r">{{r.s1}}</td><td class="r">{{r.s2}}</td><td class="r">{{r.s3}}</td><td class="r">{{r.s4}}</td><td class="r b">{{r.qtd}}</td><td class="r b">{{r.rs}}</td><td class="r">{{r.pct}}</td></tr></sc-for></tbody>
+      </table></div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== PERDAS ===================== -->
+  <sc-if value="{{is.perd}}" hint-placeholder-val="{{ false }}">
+  <div class="page">
+    <div>
+      <h1 class="h1">Lançamento de perdas</h1>
+      <p class="sub">Lance pela data · vai sozinho para o CMV da semana certa</p>
+    </div>
+    <div class="cream">Mesma lógica das entradas: a semana é encontrada pela <b>DATA</b>. Entra no CMV da semana tudo o que foi perdido <b>do dia da contagem inicial até o dia anterior à contagem final</b>.</div>
+    <div class="card" style="padding: 14px 18px">
+      <div style="display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; align-items: center">
+        <span class="kl">Períodos do CMV</span>
+        <sc-for list="{{periodos}}" as="p" hint-placeholder-count="5"><span><b>{{p.nome}}:</b> {{p.per}}</span></sc-for>
+      </div>
+    </div>
+    <div class="card">
+      <h2 class="h2">Nova perda</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; align-items: end">
+        <label class="fld">Data<input class="inp" style="min-height: 44px" value="{{pf.data}}" onChange="{{pf.onData}}" placeholder="dd/mm/aaaa"></label>
+        <label class="fld" style="grid-column: span 2">Insumo<select class="inp" value="{{pf.cod}}" onChange="{{pf.onCod}}"><sc-for list="{{insOpts}}" as="o" hint-placeholder-count="10"><option value="{{o.v}}">{{o.label}}</option></sc-for></select></label>
+        <label class="fld">Qtde perdida ({{pf.un}})<input class="inp" style="min-height: 44px" value="{{pf.qtd}}" onChange="{{pf.onQtd}}"></label>
+        <label class="fld">Motivo<select class="inp" value="{{pf.motivo}}" onChange="{{pf.onMotivo}}"><sc-for list="{{motOpts}}" as="m" hint-placeholder-count="6"><option value="{{m.v}}">{{m.v}}</option></sc-for></select></label>
+        <button class="btn" onClick="{{pf.add}}">Lançar perda</button>
+      </div>
+      <p class="sub" style="font-size: 13px; font-weight: 600; color: #16324f">{{pf.destino}}</p>
+    </div>
+    <div class="chips" role="group" aria-label="Semana">
+      <sc-for list="{{perdTabs}}" as="t" hint-placeholder-count="6"><button class="{{t.cls}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for>
+    </div>
+    <div>
+      <div class="blk"><span>{{perdBlk.titulo}}</span><span>{{perdBlk.info}}</span></div>
+      <div class="tblw tall" style="border-radius: 0 0 12px 12px">
+        <table>
+          <thead><tr><th>Data</th><th>Insumo</th><th>Unid</th><th class="r">Qtde perdida</th><th>Motivo</th><th class="r">R$ perda</th><th>Vai para</th><th></th></tr></thead>
+          <tbody>
+            <sc-for list="{{perdBlk.rows}}" as="p" hint-placeholder-count="6">
+              <tr><td>{{p.data}}</td><td class="b">{{p.label}}</td><td>{{p.un}}</td><td class="r b">{{p.qtd}}</td><td><span class="pill warn">{{p.motivo}}</span></td><td class="r b">{{p.rs}}</td><td><span class="{{p.semCls}}">{{p.semana}}</span></td><td><button class="lnk" style="color: #8f1d1d" onClick="{{p.del}}">Excluir</button></td></tr>
+            </sc-for>
+            <sc-if value="{{perdBlk.vazio}}" hint-placeholder-val="{{ false }}"><tr><td colspan="8" style="color: #5b6676; padding: 16px 10px">Nenhuma perda lançada aqui.</td></tr></sc-if>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== RESUMO PERDAS ===================== -->
+  <sc-if value="{{is.rperd}}" hint-placeholder-val="{{ false }}">
+  <div class="page">
+    <div>
+      <h1 class="h1">Resumo das perdas</h1>
+      <p class="sub">Soma automática por semana e total do mês · tudo aqui vem da tela Perdas · ranking por valor (R$)</p>
+    </div>
+    <div class="grid4">
+      <div class="kpi dark"><div class="kl">Total perdido no mês</div><div class="kv">{{rl.rsTotal}}</div><div class="ks">{{rl.total}} (soma das quantidades)</div></div>
+      <div class="kpi"><div class="kl">Lançamentos no mês</div><div class="kv">{{rl.lanc}}</div><div class="ks">linhas lançadas nas 5 semanas</div></div>
+      <div class="kpi"><div class="kl">Maior perda do mês</div><div class="kv" style="font-size: 20px">{{rl.campeao}}</div><div class="ks">{{rl.campSub}}</div></div>
+      <div class="kpi"><div class="kl">Itens diferentes</div><div class="kv">{{rl.itens}}</div><div class="ks">itens com algo perdido no mês</div></div>
+    </div>
+    <div>
+      <h2 class="h2">Destaque de cada semana — o que mais foi perdido</h2>
+      <div class="tblw"><table>
+        <thead><tr><th>Semana</th><th>Item destaque</th><th class="r">Qtde</th><th>Unid</th><th class="r">R$ do item</th><th class="r">R$ da semana</th><th class="r">Lanç.</th><th class="r">% do mês</th></tr></thead>
+        <tbody><sc-for list="{{rl.dest}}" as="d" hint-placeholder-count="5"><tr><td class="b">{{d.sem}}</td><td>{{d.item}}</td><td class="r">{{d.qtd}}</td><td>{{d.un}}</td><td class="r">{{d.rsItem}}</td><td class="r b">{{d.rsSem}}</td><td class="r">{{d.lanc}}</td><td class="r">{{d.pct}}</td></tr></sc-for></tbody>
+        <tfoot><tr><td colspan="5">TOTAL DO MÊS</td><td class="r">{{rl.rsTotal}}</td><td class="r">{{rl.lanc}}</td><td class="r">100%</td></tr></tfoot>
+      </table></div>
+    </div>
+    <div class="grid2">
+      <div>
+        <h2 class="h2">Ranking do mês — top 15</h2>
+        <div class="tblw"><table>
+          <thead><tr><th>Item</th><th>Unid</th><th class="r">Qtde mês</th><th class="r">R$ mês</th><th class="r">% do mês</th><th style="width: 22%">Peso no mês</th></tr></thead>
+          <tbody><sc-for list="{{rl.rank}}" as="r" hint-placeholder-count="3"><tr><td class="b">{{r.label}}</td><td>{{r.un}}</td><td class="r">{{r.qtd}}</td><td class="r b">{{r.rs}}</td><td class="r">{{r.pct}}</td><td><div class="bar-t"><div class="bar-f o" style="width: {{r.w}}%"></div></div></td></tr></sc-for></tbody>
+        </table></div>
+      </div>
+      <div>
+        <h2 class="h2">Perdas por motivo — por semana (R$)</h2>
+        <div class="tblw"><table>
+          <thead><tr><th>Motivo</th><th class="r">Sem 1</th><th class="r">Sem 2</th><th class="r">Sem 3</th><th class="r">Sem 4</th><th class="r">Sem 5</th><th class="r">Total mês</th><th class="r">% perdas</th></tr></thead>
+          <tbody><sc-for list="{{motSem}}" as="m" hint-placeholder-count="6"><tr><td class="b">{{m.nome}}</td><td class="r">{{m.s0}}</td><td class="r">{{m.s1}}</td><td class="r">{{m.s2}}</td><td class="r">{{m.s3}}</td><td class="r">{{m.s4}}</td><td class="r b">{{m.tot}}</td><td class="r">{{m.pct}}</td></tr></sc-for></tbody>
+        </table></div>
+      </div>
+    </div>
+    <div>
+      <h2 class="h2">Todos os itens — soma de cada semana e total do mês</h2>
+      <div class="tblw"><table>
+        <thead><tr><th>Item</th><th>Unid</th><th class="r">Sem 1</th><th class="r">Sem 2</th><th class="r">Sem 3</th><th class="r">Sem 4</th><th class="r">Sem 5</th><th class="r">Total mês</th><th class="r">R$ mês</th><th class="r">% mês</th></tr></thead>
+        <tbody><sc-for list="{{rl.all}}" as="r" hint-placeholder-count="3"><tr><td class="b">{{r.label}}</td><td>{{r.un}}</td><td class="r">{{r.s0}}</td><td class="r">{{r.s1}}</td><td class="r">{{r.s2}}</td><td class="r">{{r.s3}}</td><td class="r">{{r.s4}}</td><td class="r b">{{r.qtd}}</td><td class="r b">{{r.rs}}</td><td class="r">{{r.pct}}</td></tr></sc-for></tbody>
+      </table></div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== CMV SEMANA N ===================== -->
+  <sc-if value="{{is.cmv}}" hint-placeholder-val="{{ false }}">
+  <div class="page">
+    <div class="row">
+      <div>
+        <h1 class="h1">Controle de CMV — {{cw.nome}}</h1>
+        <p class="sub">Estoque inicial + entradas + produção − estoque final = utilizado</p>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap"><span class="{{cw.stCls}}" style="font-size: 12px; padding: 6px 12px">{{cw.stTxt}}</span><button class="btn" onClick="{{openCmv}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>Imprimir CMV da semana</button></div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 14px">
+      <div class="card" style="flex: 1 1 280px">
+        <h2 class="h2">Dados da semana</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+          <label class="fld">Data inicial (contagem inicial)<input class="inp" value="{{cw.dIni}}" onChange="{{cw.onIniD}}" placeholder="{{cw.iniPh}}"></label>
+          <label class="fld">Data final (contagem final)<input class="inp" value="{{cw.dFim}}" onChange="{{cw.onFimD}}" placeholder="dd/mm/aaaa"></label>
+          <label class="fld">Faturamento da semana<input class="inp" value="{{cw.fatStr}}" onChange="{{cw.onFat}}" placeholder="R$"></label>
+          <label class="fld">Meta de CMV<input class="inp" value="{{cw.metaStr}}" onChange="{{cw.onMeta}}" placeholder="35%"></label>
+        </div>
+        <div style="margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: #e4ecf6; border: 1px solid #c7d6e8; font-size: 13px; line-height: 1.5; color: #16324f"><b>{{cw.periodo}}</b><br><span style="color: #3d4a5c">{{cw.periodoCont}}</span></div>
+      </div>
+      <div class="grid4" style="flex: 999 1 560px">
+        <div class="kpi dark"><div class="kl">Seu CMV real</div><div class="kv">{{cw.cmvTxt}}</div><div class="ks">{{cw.metaTxt}}</div></div>
+        <div class="kpi"><div class="kl">CMV x meta</div><div class="kv" style="font-size: 20px">{{cw.diff}}</div><div><span class="{{cw.stCls}}">{{cw.stTxt}}</span></div></div>
+        <div class="kpi"><div class="kl">Utilizado CMV</div><div class="kv">{{cw.utilCmv}}</div><div class="ks">só itens que entram no CMV</div></div>
+        <div class="kpi"><div class="kl">% perda</div><div class="kv">{{cw.perdaPct}}</div><div class="ks">Perdas: {{cw.perdas}}</div></div>
+      </div>
+    </div>
+
+    <div class="cream">⚠ Cada linha é um CÓD fixo do cadastro: o número digitado fica sempre com o mesmo produto, mesmo se renomear ou mudar a lista de contagem. O uso só é calculado depois que o ESTOQUE FINAL da semana for lançado. Valor unit. em vermelho = item sem preço. Qtde negativa = conferir contagem. <b>{{cw.iniHint}}</b></div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2 class="h2">Resumo geral (R$)</h2>
+        <div class="mini">
+          <div>(+) Estoque inicial</div><div class="v">{{cw.rIni}}</div>
+          <div>(=) Utilizado total</div><div class="v">{{cw.utilTot}}</div>
+          <div>(=) Utilizado CMV</div><div class="v">{{cw.utilCmv}}</div>
+          <div>(!) Perdas</div><div class="v">{{cw.perdas}}</div>
+          <div>(+) Entradas</div><div class="v">{{cw.rEnt}}</div>
+          <div>(+) Produção</div><div class="v">{{cw.rProd}}</div>
+          <div>(−) Estoque final</div><div class="v">{{cw.rFin}}</div>
+        </div>
+      </div>
+      <div class="card">
+        <h2 class="h2">Onde foi o dinheiro — por categoria</h2>
+        <div class="tblw" style="border: 0"><table>
+          <thead><tr><th>Categoria</th><th class="r">R$ utilizado</th><th class="r">% do total</th><th style="width: 35%"></th></tr></thead>
+          <tbody><sc-for list="{{cw.cats}}" as="c" hint-placeholder-count="6"><tr><td class="b">{{c.nome}}</td><td class="r">{{c.rs}}</td><td class="r">{{c.pct}}</td><td><div class="bar-t"><div class="bar-f" style="width: {{c.w}}%"></div></div></td></tr></sc-for></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 14px 18px; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center">
+      <span class="kl">Ordem da lista</span>
+      <div class="chips" role="group" aria-label="Ordem da lista"><sc-for list="{{ordChips}}" as="o" hint-placeholder-count="3"><button class="{{o.cls}}" onClick="{{o.pick}}">{{o.nome}}</button></sc-for></div>
+      <span class="sub" style="margin: 0; font-size: 12px">{{ordHint}}</span>
+    </div>
+    <div class="tblw tall">
+      <table>
+        <thead>
+          <tr><th colspan="6" class="grpH">Cada linha = 1 CÓD do cadastro (fixo)</th><th class="grpH">{{cw.iniGrp}}</th><th colspan="2" class="grpH">Auto · Produção e entrada</th><th class="grpH" style="background: #dce6f2; color: #0b1c30">Você preenche</th><th colspan="4" class="grpH">Automático</th><th colspan="4" class="grpH">Valor em R$ (qtde × valor unit.)</th></tr>
+          <tr><th>CÓD</th><th>Produto</th><th>Unid</th><th class="r">Valor unit.</th><th>Categoria</th><th>CMV?</th>
+          <th class="{{cw.iniThCls}}">Estoque inicial</th><th class="r">Entradas</th><th class="r">Produção</th><th class="r fill">Estoque final</th>
+          <th class="r">Qtde utilizada</th><th class="r">R$ utilizado</th><th class="r">Qtde perda</th><th class="r">R$ perda</th>
+          <th class="r">R$ est. inicial</th><th class="r">R$ entradas (total)</th><th class="r">R$ produção</th><th class="r">R$ est. final</th></tr>
+        </thead>
+          <sc-for list="{{cw.groups}}" as="g" hint-placeholder-count="1"><tbody>
+            <sc-if value="{{g.hdr}}" hint-placeholder-val="{{ false }}"><tr><td colspan="19" class="grow">{{g.nome}} · {{g.n}} itens</td></tr></sc-if>
+            <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="12">
+            <tr>
+              <td class="code">{{r.cod}}</td><td class="b">{{r.nome}}</td><td>{{r.un}}</td><td class="{{r.unitCls}}">{{r.unitTxt}}</td><td><span class="{{r.catCls}}">{{r.cat}}</span></td><td>{{r.cmvTxt}}</td>
+              <td class="r">
+                <sc-if value="{{r.iniEdit}}" hint-placeholder-val="{{ false }}"><input class="inp num" value="{{r.ini}}" onChange="{{r.onIni}}" aria-label="Estoque inicial {{r.nome}}"></sc-if>
+                <sc-if value="{{r.iniAuto}}" hint-placeholder-val="{{ true }}">{{r.ini}}</sc-if>
+              </td>
+              <td class="r">{{r.ent}}</td>
+              <td class="r">{{r.prod}}</td>
+              <td class="r"><input class="inp num" value="{{r.fin}}" onChange="{{r.onFin}}" aria-label="Estoque final {{r.nome}}"></td>
+              <td class="{{r.usoCls}}">{{r.uso}}</td><td class="r b">{{r.rs}}</td><td class="r">{{r.perda}}</td><td class="r">{{r.rsPerda}}</td>
+              <td class="r">{{r.rsIni}}</td><td class="r">{{r.rsEnt}}</td><td class="r">{{r.rsProd}}</td><td class="r">{{r.rsFin}}</td>
+            </tr>
+            </sc-for>
+          </tbody></sc-for>
+        <tfoot><tr><td colspan="11">TOTAL</td><td class="r">{{cw.utilTot}}</td><td></td><td class="r">{{cw.perdas}}</td><td class="r">{{cw.rIni}}</td><td class="r">{{cw.rEnt}}</td><td class="r">{{cw.rProd}}</td><td class="r">{{cw.rFin}}</td></tr></tfoot>
+      </table>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== FECHAMENTO ===================== -->
+  <sc-if value="{{is.fech}}" hint-placeholder-val="{{ false }}">
+  <div class="page">
+    <div class="row">
+      <div>
+        <h1 class="h1">Fechamento do mês</h1>
+        <p class="sub">CMV, produção e perdas consolidados das 5 semanas · tudo aqui é automático, vem das telas CMV Semana 1 a 5, Produção e Perdas</p>
+      </div>
+      <button class="btn sec" onClick="{{openFech}}">Imprimir / PDF</button>
+    </div>
+    <div class="card" style="display: flex; gap: 16px; flex-wrap: wrap; align-items: end">
+      <label class="fld" style="min-width: 220px">Mês de referência<input class="inp" style="min-height: 44px" value="{{mes.mesStr}}" onChange="{{mes.onMes}}" placeholder="Ex.: Outubro 2026"></label>
+      <label class="fld" style="width: 160px">Meta de CMV do mês<input class="inp" style="min-height: 44px" value="{{mes.metaStr}}" onChange="{{mes.onMeta}}" placeholder="35%"></label>
+    </div>
+    <div class="grid4" style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr))">
+      <div class="kpi"><div class="kl">Faturamento do mês</div><div class="kv">{{mes.fat}}</div><div class="ks">{{mes.ref}}</div></div>
+      <div class="kpi dark"><div class="kl">CMV do mês</div><div class="kv">{{mes.cmv}}</div><div class="ks">Meta: {{mes.meta}}</div></div>
+      <div class="kpi"><div class="kl">CMV x meta</div><div class="kv" style="font-size: 20px">{{mes.diff}}</div><div><span class="{{mes.stCls}}">{{mes.stTxt}}</span></div></div>
+      <div class="kpi"><div class="kl">Utilizado CMV</div><div class="kv">{{mes.util}}</div><div class="ks">Uso total: {{mes.utilTot}}</div></div>
+      <div class="kpi"><div class="kl">Perdas do mês</div><div class="kv">{{mes.perdas}}</div><div class="ks">{{mes.perdaPct}} do utilizado</div></div>
+      <div class="kpi"><div class="kl">Produção do mês</div><div class="kv">{{mes.prod}}</div><div class="ks">{{mes.prodN}} lançamentos de produção</div></div>
+    </div>
+    <div>
+      <h2 class="h2">Evolução semana a semana</h2>
+      <div class="tblw"><table>
+        <thead><tr><th>Semana</th><th>Início</th><th>Fim</th><th class="r">Faturamento</th><th class="r">Utilizado CMV</th><th class="r">CMV %</th><th class="r">Meta</th><th>Status</th><th class="r">Perdas R$</th><th class="r">Produção R$</th><th style="width: 16%">CMV % na semana</th></tr></thead>
+        <tbody><sc-for list="{{weeks}}" as="w" hint-placeholder-count="5"><tr><td class="b">{{w.nome}}</td><td>{{w.dIni}}</td><td>{{w.dFim}}</td><td class="r">{{w.fat}}</td><td class="r">{{w.util}}</td><td class="r b">{{w.cmv}}</td><td class="r">{{w.meta}}</td><td><span class="{{w.stCls}}">{{w.stTxt}}</span></td><td class="r">{{w.perdas}}</td><td class="r">{{w.prod}}</td><td><div class="bar-t"><div class="{{w.barF}}" style="width: {{w.bw}}%"></div></div></td></tr></sc-for></tbody>
+        <tfoot><tr><td colspan="3">TOTAL DO MÊS</td><td class="r">{{mes.fat}}</td><td class="r">{{mes.util}}</td><td class="r">{{mes.cmv}}</td><td class="r">{{mes.meta}}</td><td></td><td class="r">{{mes.perdas}}</td><td class="r">{{mes.prod}}</td><td></td></tr></tfoot>
+      </table></div>
+    </div>
+    <div class="grid3">
+      <div class="card">
+        <h2 class="h2">Gasto por categoria no mês</h2>
+        <div class="tblw" style="border: 0"><table>
+          <thead><tr><th>Categoria</th><th class="r">R$ utilizado</th><th class="r">% total</th></tr></thead>
+          <tbody><sc-for list="{{mes.cats}}" as="c" hint-placeholder-count="6"><tr><td class="b">{{c.nome}}</td><td class="r">{{c.rs}}</td><td class="r">{{c.pct}}</td></tr></sc-for></tbody>
+        </table></div>
+      </div>
+      <div class="card">
+        <h2 class="h2">Perdas por motivo</h2>
+        <div class="tblw" style="border: 0"><table>
+          <thead><tr><th>Motivo</th><th class="r">R$ perdido</th><th class="r">% perdas</th></tr></thead>
+          <tbody><sc-for list="{{motSem}}" as="m" hint-placeholder-count="6"><tr><td class="b">{{m.nome}}</td><td class="r">{{m.tot}}</td><td class="r">{{m.pct}}</td></tr></sc-for></tbody>
+        </table></div>
+      </div>
+      <div class="card">
+        <h2 class="h2">Top 10 — onde mais foi dinheiro</h2>
+        <div class="tblw" style="border: 0"><table>
+          <thead><tr><th>Produto</th><th class="r">R$ utilizado</th><th class="r">% do uso total</th></tr></thead>
+          <tbody><sc-for list="{{mes.top10}}" as="t" hint-placeholder-count="10"><tr><td class="b">{{t.nome}}</td><td class="r">{{t.rs}}</td><td class="r">{{t.pct}}</td></tr></sc-for></tbody>
+        </table></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h2 class="h2">CMV % por semana x meta</h2>
+        <div class="chart">
+          <div class="metal" style="bottom: {{metaBottom}}px"><span class="metat">Meta {{metaTxt}}</span></div>
+          <sc-for list="{{weeks}}" as="w" hint-placeholder-count="5">
+            <div class="cb"><div class="cbv">{{w.cmv}}</div><div class="{{w.barCls}}" style="height: {{w.h}}px"></div></div>
+          </sc-for>
+        </div>
+        <div class="clab"><div>Sem 1</div><div>Sem 2</div><div>Sem 3</div><div>Sem 4</div><div>Sem 5</div></div>
+      </div>
+      <div class="card">
+        <h2 class="h2">Top 10 — R$ utilizado no mês</h2>
+        <sc-if value="{{mes.noTop}}" hint-placeholder-val="{{ false }}"><p class="sub" style="margin: 0">Aparece quando houver estoque final lançado e itens com preço no cadastro.</p></sc-if>
+        <sc-for list="{{mes.top10}}" as="t" hint-placeholder-count="10">
+          <div style="display: grid; grid-template-columns: 150px 1fr 96px; gap: 10px; align-items: center; font-size: 13px; padding: 4px 0"><div style="font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{t.nome}}</div><div class="bar-t"><div class="bar-f o" style="width: {{t.w}}%"></div></div><div style="text-align: right; font-weight: 800">{{t.rs}}</div></div>
+        </sc-for>
+      </div>
+    </div>
+    <div>
+      <h2 class="h2">Detalhe por item — tudo que foi produzido, perdido e usado</h2>
+      <div class="tblw tall"><table>
+        <thead>
+          <tr><th colspan="4" class="grpH"></th><th colspan="7" class="grpH">Produção</th><th colspan="2" class="grpH" style="background: #2b4a6d">Perdas</th><th colspan="2" class="grpH">Uso (CMV)</th></tr>
+          <tr><th>Produto</th><th>Unid</th><th>Categoria</th><th>CMV?</th><th class="r">Sem 1</th><th class="r">Sem 2</th><th class="r">Sem 3</th><th class="r">Sem 4</th><th class="r">Sem 5</th><th class="r">Total produzido</th><th class="r">R$ produzido</th><th class="r">Qtde perdida</th><th class="r">R$ perdido</th><th class="r">Qtde usada</th><th class="r">R$ usado</th></tr>
+        </thead>
+        <tbody><sc-for list="{{detalhe}}" as="d" hint-placeholder-count="12"><tr><td class="b">{{d.nome}}</td><td>{{d.un}}</td><td>{{d.cat}}</td><td>{{d.cmv}}</td><td class="r">{{d.p0}}</td><td class="r">{{d.p1}}</td><td class="r">{{d.p2}}</td><td class="r">{{d.p3}}</td><td class="r">{{d.p4}}</td><td class="r b">{{d.pt}}</td><td class="r">{{d.prs}}</td><td class="r">{{d.lq}}</td><td class="r">{{d.lrs}}</td><td class="r b">{{d.uq}}</td><td class="r b">{{d.urs}}</td></tr></sc-for></tbody>
+      </table></div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== CMC COMPRAS ===================== -->
+  <sc-if value="{{is.cmc}}" hint-placeholder-val="{{ false }}">
+  <div class="page">
+    <div class="row">
+      <div>
+        <h1 class="h1">CMC — CMV de compras</h1>
+        <p class="sub">Compras ÷ faturamento · para quem ainda não faz contagem de estoque</p>
+      </div>
+    </div>
+    <div class="cream">Lance cada nota de compra embaixo (data, fornecedor, nº da nota, categoria e valor). A semana é encontrada sozinha pela data. <b>Digite o faturamento de cada semana na tabela "Semana a semana"</b> (é o mesmo faturamento do CMV da semana: digitou aqui, aparece lá). Mostra o CMC por semana e no mês, por categoria, e compara com o CMV real se as telas de CMV estiverem em uso.</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 14px">
+      <div class="card" style="flex: 1 1 280px">
+        <h2 class="h2">Dados do mês</h2>
+        <div class="mini">
+          <div>Mês de referência</div><div class="v">{{cmc.mesRef}}</div>
+          <div style="display: flex; align-items: center">Meta de CMC</div><div class="v"><input class="inp num" value="{{cmc.metaStr}}" onChange="{{cmc.onMeta}}" placeholder="35%" aria-label="Meta de CMC"></div>
+          <div>Compras fora das semanas</div><div class="v">{{cmc.fora}}</div>
+        </div>
+      </div>
+      <div class="grid4" style="flex: 999 1 520px">
+        <div class="kpi dark"><div class="kl">CMC do mês</div><div class="kv">{{cmc.pct}}</div><div class="ks">Meta: {{cmc.meta}}</div></div>
+        <div class="kpi"><div class="kl">CMC x meta</div><div class="kv" style="font-size: 20px">{{cmc.diff}}</div><div><span class="{{cmc.stCls}}">{{cmc.stTxt}}</span></div></div>
+        <div class="kpi"><div class="kl">Compras do mês</div><div class="kv">{{cmc.cmc}}</div><div class="ks">Total geral (com o que não entra): {{cmc.total}}</div></div>
+      </div>
+    </div>
+    <div>
+      <h2 class="h2">Semana a semana</h2>
+      <div class="tblw"><table>
+        <thead><tr><th>Semana</th><th>Data inicial</th><th>Data final</th><th class="r fill">Faturamento (digite)</th><th class="r">Compras (CMC)</th><th class="r">CMC %</th><th class="r">Meta</th><th>Situação</th><th class="r">CMV real (contagem)</th><th class="r">CMC − CMV</th></tr></thead>
+        <tbody><sc-for list="{{cmc.weeks}}" as="w" hint-placeholder-count="5"><tr><td class="b">{{w.nome}}</td><td>{{w.dIni}}</td><td>{{w.dFim}}</td><td class="r"><input class="inp num" style="width: 120px" value="{{w.fatStr}}" onChange="{{w.onFat}}" placeholder="R$" aria-label="Faturamento {{w.nome}}"></td><td class="r">{{w.comp}}</td><td class="r b">{{w.pct}}</td><td class="r">{{cmc.meta}}</td><td><span class="{{w.stCls}}">{{w.stTxt}}</span></td><td class="r">{{w.cmv}}</td><td class="r b">{{w.diff}}</td></tr></sc-for></tbody>
+        <tfoot><tr><td colspan="3">MÊS</td><td class="r">{{mes.fat}}</td><td class="r">{{cmc.cmc}}</td><td class="r">{{cmc.pct}}</td><td class="r">{{cmc.meta}}</td><td><span class="{{cmc.stCls}}">{{cmc.stTxt}}</span></td><td class="r">{{cmc.cmvMes}}</td><td></td></tr></tfoot>
+      </table></div>
+      <p class="sub">CMC − CMV positivo = comprou mais do que usou (estoque aumentou).</p>
+    </div>
+    <div>
+      <h2 class="h2">Onde foi o dinheiro — compras por categoria no mês</h2>
+      <div class="tblw"><table>
+        <thead><tr><th>Categoria</th><th>Entra no CMC?</th><th class="r">R$ compras</th><th class="r">% das compras</th><th class="r">% do faturamento</th><th style="width: 24%">Peso</th></tr></thead>
+        <tbody><sc-for list="{{cmc.cats}}" as="c" hint-placeholder-count="6"><tr><td class="b">{{c.nome}}</td><td>{{c.entra}}</td><td class="r">{{c.rs}}</td><td class="r">{{c.pc}}</td><td class="r">{{c.pf}}</td><td><div class="bar-t"><div class="bar-f" style="width: {{c.w}}%"></div></div></td></tr></sc-for></tbody>
+        <tfoot><tr><td colspan="2">TOTAL</td><td class="r">{{cmc.total}}</td><td class="r">100%</td><td></td><td></td></tr></tfoot>
+      </table></div>
+    </div>
+    <div>
+      <h2 class="h2">Lançamento das compras (uma linha por nota / boleto)</h2>
+      <div class="card" style="margin-bottom: 12px">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; align-items: end">
+          <label class="fld">Data<input class="inp" style="min-height: 44px" value="{{cmc.nota.data}}" onChange="{{cmc.nota.onData}}" placeholder="dd/mm/aaaa"></label>
+          <label class="fld" style="grid-column: span 2">Fornecedor<input class="inp" style="min-height: 44px" value="{{cmc.nota.forn}}" onChange="{{cmc.nota.onForn}}" placeholder="Nome do fornecedor"></label>
+          <label class="fld">Nº nota<input class="inp" style="min-height: 44px" value="{{cmc.nota.nf}}" onChange="{{cmc.nota.onNf}}"></label>
+          <label class="fld">Categoria<select class="inp" value="{{cmc.nota.cat}}" onChange="{{cmc.nota.onCat}}"><sc-for list="{{catNames}}" as="c" hint-placeholder-count="6"><option value="{{c.nome}}">{{c.nome}}</option></sc-for></select></label>
+          <label class="fld">Valor (R$)<input class="inp" style="min-height: 44px" value="{{cmc.nota.valor}}" onChange="{{cmc.nota.onValor}}" placeholder="R$"></label>
+          <label class="fld">Observação<input class="inp" style="min-height: 44px" value="{{cmc.nota.obs}}" onChange="{{cmc.nota.onObs}}"></label>
+          <button class="btn" onClick="{{cmc.nota.add}}">Lançar nota</button>
+        </div>
+        <p class="sub" style="font-size: 13px; font-weight: 600; color: #16324f">{{cmc.nota.destino}}</p>
+      </div>
+      <div class="tblw"><table>
+        <thead><tr><th>Data</th><th>Fornecedor</th><th>Nº nota</th><th>Categoria</th><th class="r">Valor (R$)</th><th>Observação</th><th>Semana</th><th>Entra no CMC?</th><th></th></tr></thead>
+        <tbody>
+          <sc-for list="{{cmc.notas}}" as="n" hint-placeholder-count="8"><tr><td>{{n.data}}</td><td class="b">{{n.forn}}</td><td>{{n.nf}}</td><td><span class="{{n.catCls}}">{{n.cat}}</span></td><td class="r b">{{n.rs}}</td><td>{{n.obs}}</td><td><span class="{{n.semCls}}">{{n.sem}}</span></td><td>{{n.entra}}</td><td><button class="lnk" style="color: #8f1d1d" onClick="{{n.del}}">Excluir</button></td></tr></sc-for>
+          <sc-if value="{{cmc.vazio}}" hint-placeholder-val="{{ false }}"><tr><td colspan="9" style="color: #5b6676; padding: 16px 10px">Nenhuma nota lançada ainda.</td></tr></sc-if>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== ESTOQUE MÍNIMO ===================== -->
+  <sc-if value="{{is.est}}" hint-placeholder-val="{{ false }}">
+  <div class="page">
+    <div class="row">
+      <div>
+        <h1 class="h1">Estoque mínimo</h1>
+        <p class="sub">Calculado pela média de uso das semanas fechadas</p>
+      </div>
+      <button class="btn" onClick="{{openCompras}}">Gerar lista de compras</button>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 14px">
+      <div class="card" style="flex: 1 1 300px">
+        <h2 class="h2">Parâmetros</h2>
+        <div style="display: grid; grid-template-columns: 1fr 90px; gap: 8px; align-items: center; font-size: 13px">
+          <span>Dias de operação na semana</span><input class="inp num" value="{{est.dias}}" onChange="{{est.onDias}}" aria-label="Dias de operação">
+          <span>Prazo de reposição padrão (dias)</span><input class="inp num" value="{{est.prazo}}" onChange="{{est.onPrazo}}" aria-label="Prazo de reposição">
+          <span>Margem de segurança</span><input class="inp num" value="{{est.margem}}" onChange="{{est.onMargem}}" aria-label="Margem">
+          <span>Cobertura do estoque ideal (dias)</span><input class="inp num" value="{{est.cob}}" onChange="{{est.onCob}}" aria-label="Cobertura">
+        </div>
+      </div>
+      <div class="card" style="flex: 1 1 300px">
+        <h2 class="h2">Semanas fechadas (entram na média)</h2>
+        <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; text-align: center; font-size: 12px; font-weight: 800">
+          <sc-for list="{{weeks}}" as="w" hint-placeholder-count="5"><div style="display: flex; flex-direction: column; gap: 6px"><span style="color: #5b6676">{{w.short}}</span><span class="{{w.fechCls}}">{{w.fechTxt}}</span></div></sc-for>
+          <div style="display: flex; flex-direction: column; gap: 6px"><span style="color: #5b6676">Na média</span><span style="font-size: 18px">{{est.nClosed}}</span></div>
+        </div>
+        <p class="sub" style="font-size: 12px">Semana fechada = estoque final já lançado no CMV daquela semana.</p>
+      </div>
+      <div class="grid4" style="flex: 1 1 300px; grid-template-columns: 1fr">
+        <div class="kpi dark"><div class="kl">Itens para comprar</div><div class="kv">{{est.nComprar}}</div><div class="ks">estoque atual ≤ mínimo</div></div>
+        <div class="kpi"><div class="kl">Compra sugerida (R$)</div><div class="kv">{{est.total}}</div><div class="ks">para voltar ao estoque ideal · {{est.nOk}} itens OK</div></div>
+      </div>
+    </div>
+    <div class="cream">Como calcula: média diária = média semanal ÷ dias de operação · ESTOQUE MÍNIMO = média diária × prazo de reposição × (1 + margem) · ESTOQUE IDEAL = mínimo + média diária × dias de cobertura · Estoque atual = estoque final da última semana fechada ({{est.ultima}}). Itens em und, cx e pct arredondam para cima.</div>
+    <div class="chips" role="group" aria-label="Filtrar itens"><sc-for list="{{est.chips}}" as="c" hint-placeholder-count="2"><button class="{{c.cls}}" onClick="{{c.pick}}">{{c.nome}}</button></sc-for></div>
+    <div class="tblw tall">
+      <table>
+        <thead>
+          <tr><th colspan="3" class="grpH"></th><th colspan="5" class="grpH">Uso por semana (das telas CMV)</th><th colspan="3" class="grpH">Médias</th><th class="grpH" style="background: #dce6f2; color: #0b1c30">Você ajusta</th><th colspan="7" class="grpH">Resultado</th></tr>
+          <tr><th>Produto</th><th>Unid</th><th>Categoria</th><th class="r">Sem 1</th><th class="r">Sem 2</th><th class="r">Sem 3</th><th class="r">Sem 4</th><th class="r">Sem 5</th><th class="r">Média semanal</th><th class="r">Pico semanal</th><th class="r">Média diária</th><th class="r fill">Prazo reposição (dias)</th><th class="r">Estoque mínimo</th><th class="r">Estoque ideal</th><th class="r">Estoque atual</th><th>Situação</th><th class="r">Sugestão de compra</th><th class="r">R$ da compra</th></tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{estRows}}" as="r" hint-placeholder-count="12">
+            <tr><td class="b">{{r.nome}}</td><td>{{r.un}}</td><td>{{r.cat}}</td><td class="r">{{r.s0}}</td><td class="r">{{r.s1}}</td><td class="r">{{r.s2}}</td><td class="r">{{r.s3}}</td><td class="r">{{r.s4}}</td><td class="r">{{r.med}}</td><td class="r">{{r.pico}}</td><td class="r">{{r.dia}}</td><td class="r"><input class="inp num" value="{{r.prazo}}" onChange="{{r.onPrazo}}" placeholder="{{est.prazo}}" aria-label="Prazo {{r.nome}}"></td><td class="r">{{r.min}}</td><td class="r">{{r.ideal}}</td><td class="r b">{{r.atual}}</td><td><span class="{{r.stCls}}">{{r.stTxt}}</span></td><td class="r b">{{r.sug}}</td><td class="r">{{r.rs}}</td></tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== RESUMO FICHAS ===================== -->
+  <sc-if value="{{is.rfichas}}" hint-placeholder-val="{{ false }}">
+  <div class="page">
+    <div>
+      <h1 class="h1">Resumo das fichas técnicas</h1>
+      <p class="sub">As 100 fichas em uma tela · salão × apps de delivery · clique no Nº para abrir a ficha</p>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 14px">
+      <div class="card" style="flex: 1 1 360px">
+        <h2 class="h2">Configuração do delivery</h2>
+        <div class="tblw" style="border: 0"><table>
+          <thead><tr><th></th><th class="r fill">App 1</th><th class="r fill">App 2</th></tr></thead>
+          <tbody>
+            <tr><td class="b">Nome do app</td><sc-for list="{{rf.apps}}" as="a" hint-placeholder-count="2"><td class="r"><input class="inp" style="width: 110px" value="{{a.nome}}" onChange="{{a.onNome}}" placeholder="{{a.ph}}" aria-label="Nome do app"></td></sc-for></tr>
+            <tr><td class="b">Comissão do app (%)</td><sc-for list="{{rf.apps}}" as="a" hint-placeholder-count="2"><td class="r"><input class="inp num" value="{{a.com}}" onChange="{{a.onCom}}" placeholder="0%" aria-label="Comissão {{a.ph}}"></td></sc-for></tr>
+            <tr><td class="b">Taxa de pagamento online (%)</td><sc-for list="{{rf.apps}}" as="a" hint-placeholder-count="2"><td class="r"><input class="inp num" value="{{a.pag}}" onChange="{{a.onPag}}" placeholder="0%" aria-label="Taxa de pagamento {{a.ph}}"></td></sc-for></tr>
+            <tr><td class="b">Total de taxas</td><sc-for list="{{rf.apps}}" as="a" hint-placeholder-count="2"><td class="r b">{{a.tot}}</td></sc-for></tr>
+            <tr><td class="b">Categoria de embalagem</td><td class="r" colspan="2"><select class="inp" value="{{rf.embCat}}" onChange="{{rf.onEmb}}" aria-label="Categoria de embalagem"><sc-for list="{{catNames}}" as="c" hint-placeholder-count="6"><option value="{{c.nome}}">{{c.nome}}</option></sc-for></select></td></tr>
+          </tbody>
+        </table></div>
+        <p class="sub" style="font-size: 12px">Taxas padrão dos apps (a ficha pode ter a sua própria). Itens da categoria de embalagem só aparecem no bloco EMBALAGEM das fichas.</p>
+      </div>
+      <div class="grid4" style="flex: 999 1 560px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))">
+        <div class="kpi"><div class="kl">Fichas preenchidas</div><div class="kv">{{fx.n}}</div><div class="ks">de 100 fichas</div></div>
+        <div class="kpi"><div class="kl">CMV médio · salão</div><div class="kv">{{fx.cmvS}}</div><div class="ks">{{fx.acima}} prato(s) acima da meta</div></div>
+        <div class="kpi"><div class="kl">CMV + taxas · App 1</div><div class="kv">{{fx.cmv1}}</div><div class="ks">{{fx.app1}} · média dos pratos com preço</div></div>
+        <div class="kpi"><div class="kl">CMV + taxas · App 2</div><div class="kv">{{fx.cmv2}}</div><div class="ks">{{fx.app2}} · média dos pratos com preço</div></div>
+        <div class="kpi dark"><div class="kl">Alertas nos apps</div><div class="kv">{{fx.alert}}</div><div class="ks">com preço abaixo do sugerido · {{fx.prej}} com PREJUÍZO</div></div>
+      </div>
+    </div>
+    <div class="tblw tall">
+      <table>
+        <thead>
+          <tr><th colspan="6" class="grpH">Prato</th><th colspan="4" class="grpH" style="background: #2b4a6d">Salão</th><th colspan="5" class="grpH" style="background: #2b4a6d">{{fx.app1}}</th><th colspan="5" class="grpH" style="background: #2b4a6d">{{fx.app2}}</th></tr>
+          <tr><th>Nº</th><th>Prato</th><th>Categoria</th><th class="r">Custo por porção</th><th class="r">Embalagem</th><th class="r">Meta</th>
+          <th class="r">Preço</th><th class="r">CMV</th><th class="r">Lucro</th><th>Situação</th>
+          <th class="r">Preço</th><th class="r">CMV + taxas</th><th class="r">Sugerido</th><th class="r">Lucro</th><th>Situação</th>
+          <th class="r">Preço</th><th class="r">CMV + taxas</th><th class="r">Sugerido</th><th class="r">Lucro</th><th>Situação</th></tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{fichas}}" as="f" hint-placeholder-count="12">
+            <tr>
+              <td><button class="lnk" onClick="{{f.open}}">{{f.num}}</button></td><td class="b">{{f.nome}}</td><td>{{f.cat}}</td><td class="r">{{f.ins}}</td><td class="r">{{f.emb}}</td><td class="r">{{f.meta}}</td>
+              <td class="r b">{{f.c0.preco}}</td><td class="r">{{f.cmvS}}</td><td class="r">{{f.lucroS}}</td><td><span class="{{f.sStCls}}">{{f.sStTxt}}</span></td>
+              <td class="r b">{{f.c2.preco}}</td><td class="r">{{f.c2.cmvT}}</td><td class="r">{{f.c2.sug}}</td><td class="r">{{f.c2.lucro}}</td><td><span class="{{f.c2.stCls}}">{{f.c2.stTxt}}</span></td>
+              <td class="r b">{{f.c3.preco}}</td><td class="r">{{f.c3.cmvT}}</td><td class="r">{{f.c3.sug}}</td><td class="r">{{f.c3.lucro}}</td><td><span class="{{f.c3.stCls}}">{{f.c3.stTxt}}</span></td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== FICHA RÁPIDA ===================== -->
+  <sc-if value="{{is.frap}}" hint-placeholder-val="{{ false }}">
+  <div class="page">
+    <div class="row">
+      <div>
+        <h1 class="h1">Ficha técnica rápida</h1>
+        <p class="sub">Consulta rápida de custo e CMV · cópia automática das 100 fichas · não precisa digitar nada aqui</p>
+      </div>
+      <button class="chip" onClick="{{toggleEmpty}}">{{emptyLbl}}</button>
+    </div>
+    <div class="cream">Qtde em g/ml para itens em kg/L; por unidade para und, cx e pct. Tudo vem da ficha completa: clique em "abrir" para editar.</div>
+    <sc-if value="{{noFraps}}" hint-placeholder-val="{{ false }}"><div class="card"><p class="sub" style="margin: 0">Nenhuma ficha preenchida ainda. Abra a FT 01 e dê um nome ao prato.</p></div></sc-if>
+    <div class="grid3">
+      <sc-for list="{{fraps}}" as="f" hint-placeholder-count="6">
+        <div class="fr">
+          <div class="fr-h"><span style="font-size: 12px; font-weight: 700; color: #475569">PRODUTO · {{f.num}}</span><button class="lnk" style="color: #ffffff" onClick="{{f.open}}">abrir</button></div>
+          <div style="padding: 10px 14px; font-weight: 800; font-size: 15px">{{f.nome}}</div>
+          <table>
+            <thead><tr><th>Insumo</th><th class="r">Qtde</th><th class="r">Custo</th></tr></thead>
+            <tbody><sc-for list="{{f.ings}}" as="i" hint-placeholder-count="3"><tr><td>{{i.nome}}</td><td class="r">{{i.q}}</td><td class="r">{{i.custo}}</td></tr></sc-for></tbody>
+          </table>
+          <div class="mini" style="padding: 6px 14px 12px; margin-top: auto">
+            <div>Custo total</div><div class="v">{{f.total}}</div>
+            <div>Porções</div><div class="v">{{f.rend}}</div>
+            <div>Custo por porção</div><div class="v">{{f.porc}}</div>
+            <div>Preço de venda</div><div class="v">{{f.preco}}</div>
+            <div>CMV %</div><div class="v">{{f.cmv}}</div>
+            <div>Lucro por porção</div><div class="v">{{f.lucro}}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== FICHA TÉCNICA (FT 01 a FT 100) ===================== -->
+  <sc-if value="{{is.ft}}" hint-placeholder-val="{{ false }}">
+  <div class="page">
+    <div class="row" style="align-items: center">
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center"><button class="lnk" onClick="{{goRF}}">◂ Resumo das fichas</button><button class="lnk" onClick="{{goFR}}">Ver ficha rápida ▸</button><button class="btn" onClick="{{openFt}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>Imprimir ficha</button><button class="lnk" style="color: #8f1d1d" onClick="{{fd.limpar}}">Apagar esta ficha</button></div>
+      <label class="fld" style="min-width: 260px">Abrir ficha
+        <select class="inp" onChange="{{pickFt}}" value="{{fd.idx}}" aria-label="Escolher ficha">
+          <sc-for list="{{ftOpts}}" as="o" hint-placeholder-count="5"><option value="{{o.v}}">{{o.label}}</option></sc-for>
+        </select>
+      </label>
+    </div>
+    <div>
+      <div class="eyebrow">Ficha técnica · {{fd.num}} · Padrão de produção</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 10px">
+        <label class="fld" style="grid-column: span 2">Nome do prato<input class="inp" value="{{fd.nome}}" onChange="{{fd.onNome}}" placeholder="Nome do prato" style="font-size: 18px; font-weight: 800; min-height: 44px"></label>
+        <label class="fld">Categoria<input class="inp" value="{{fd.cat}}" onChange="{{fd.onCat}}" placeholder="Ex.: Pokes" style="min-height: 44px"></label>
+        <label class="fld">Última revisão<input class="inp" value="{{fd.rev}}" onChange="{{fd.onRev}}" placeholder="dd/mm/aaaa" style="min-height: 44px"></label>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px">
+      <label class="photo" style="flex: 1 1 260px; cursor: pointer; overflow: hidden; position: relative; padding: 8px">
+        <sc-if value="{{fd.hasFoto}}" hint-placeholder-val="{{ false }}"><img src="{{fd.foto}}" alt="Foto do prato" style="width: 100%; height: 220px; object-fit: cover; border-radius: 8px"><span style="font-size: 12px">Clique para trocar a foto</span></sc-if>
+        <sc-if value="{{fd.noFoto}}" hint-placeholder-val="{{ true }}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#5b6676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg><span>Foto do prato · clique para enviar</span><span style="font-size: 11px; font-weight: 500">Sai junto na impressão da ficha</span></sc-if>
+        <input type="file" accept="image/*" onChange="{{fd.onFoto}}" aria-label="Enviar foto do prato" style="position: absolute; width: 1px; height: 1px; opacity: 0">
+      </label>
+      <div class="card" style="flex: 1 1 320px">
+        <h2 class="h2">Parâmetros</h2>
+        <div style="display: grid; grid-template-columns: 1fr 120px; gap: 8px; align-items: center; font-size: 13px">
+          <span>Rendimento (porções)</span><input class="inp num" style="width: 120px" value="{{fd.rendStr}}" onChange="{{fd.onRend}}" aria-label="Rendimento">
+          <span>Peso final da receita (g)</span><input class="inp num" style="width: 120px" value="{{fd.pesoStr}}" onChange="{{fd.onPeso}}" aria-label="Peso final">
+          <span>Preço de venda salão (R$)</span><input class="inp num" style="width: 120px" value="{{fd.precoStr}}" onChange="{{fd.onPreco}}" placeholder="R$" aria-label="Preço de venda">
+          <span>Meta de CMV</span><input class="inp num" style="width: 120px" value="{{fd.metaStr}}" onChange="{{fd.onMeta}}" placeholder="30%" aria-label="Meta de CMV">
+          <span>Custo por kg</span><b style="text-align: right">{{fd.custoKg}}</b>
+          <span>Preço de venda ideal</span><b style="text-align: right">{{fd.ideal}}</b>
+          <span>Lucro ideal por porção</span><b style="text-align: right">{{fd.lucroIdeal}}</b>
+          <span>Markup (preço ÷ custo)</span><b style="text-align: right">{{fd.markup}}</b>
+        </div>
+      </div>
+      <div class="grid4" style="flex: 999 1 400px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); align-content: start">
+        <div class="kpi"><div class="kl">Custo total da receita</div><div class="kv">{{fd.total}}</div><div class="ks">Rende {{fd.rend}} porção(ões)</div></div>
+        <div class="kpi"><div class="kl">Custo por porção</div><div class="kv">{{fd.porc}}</div></div>
+        <div class="kpi dark"><div class="kl">CMV real</div><div class="kv">{{fd.cmv}}</div><div><span class="{{fd.stCls}}">{{fd.stTxt}}</span></div></div>
+        <div class="kpi"><div class="kl">Lucro por porção</div><div class="kv">{{fd.lucro}}</div></div>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="h2">Ingredientes</h2>
+      <div class="tblw"><table>
+        <thead><tr><th>#</th><th class="fill">Insumo</th><th>Unid</th><th class="r">Valor unit.</th><th class="r fill">Qtde usada (g / ml / und)</th><th class="r">Custo</th><th class="r">% custo</th><th style="width: 18%">Peso no custo</th></tr></thead>
+        <tbody><sc-for list="{{fd.ings}}" as="i" hint-placeholder-count="20"><tr><td class="code">{{i.n}}</td><td><select class="inp" style="min-width: 240px; min-height: 34px; font-weight: 500" value="{{i.cod}}" onChange="{{i.onCod}}" aria-label="Insumo {{i.n}}"><sc-for list="{{i.opts}}" as="o" hint-placeholder-count="10"><option value="{{o.v}}">{{o.label}}</option></sc-for></select></td><td>{{i.un}}</td><td class="r">{{i.unit}}</td><td class="r"><input class="inp num" style="width: 100px" value="{{i.q}}" onChange="{{i.onQ}}" aria-label="Quantidade {{i.n}}"></td><td class="r b">{{i.custo}}</td><td class="r">{{i.pct}}</td><td><div class="bar-t"><div class="bar-f o" style="width: {{i.w}}%"></div></div></td></tr></sc-for></tbody>
+        <tfoot><tr><td colspan="5">CUSTO TOTAL DA RECEITA</td><td class="r">{{fd.total}}</td><td class="r">100%</td><td></td></tr></tfoot>
+      </table></div>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <h2 class="h2">Embalagem — só retirada e delivery</h2>
+        <div class="tblw"><table>
+          <thead><tr><th>#</th><th class="fill">Embalagem</th><th>Unid</th><th class="r">Valor unit.</th><th class="r fill">Qtde por porção</th><th class="r">Custo</th></tr></thead>
+          <tbody><sc-for list="{{fd.embs}}" as="i" hint-placeholder-count="5"><tr><td class="code">{{i.n}}</td><td><select class="inp" style="min-width: 200px; min-height: 34px; font-weight: 500" value="{{i.cod}}" onChange="{{i.onCod}}" aria-label="Embalagem {{i.n}}"><sc-for list="{{i.opts}}" as="o" hint-placeholder-count="5"><option value="{{o.v}}">{{o.label}}</option></sc-for></select></td><td>{{i.un}}</td><td class="r">{{i.unit}}</td><td class="r"><input class="inp num" value="{{i.q}}" onChange="{{i.onQ}}" aria-label="Quantidade embalagem {{i.n}}"></td><td class="r b">{{i.custo}}</td></tr></sc-for></tbody>
+          <tfoot><tr><td colspan="5">CUSTO DE EMBALAGEM POR PORÇÃO</td><td class="r">{{fd.emb}}</td></tr></tfoot>
+        </table></div>
+        <p class="sub" style="font-size: 12px">A embalagem é escolhida só da lista de embalagens do cadastro e não entra no CMV do salão.</p>
+      </div>
+      <div>
+        <h2 class="h2">Preço sugerido por canal · 1 unidade</h2>
+        <div class="tblw"><table>
+          <thead><tr><th></th><sc-for list="{{fd.chans}}" as="c" hint-placeholder-count="4"><th class="r">{{c.nome}}</th></sc-for></tr></thead>
+          <tbody>
+            <tr><td class="b">Custo (receita + embalagem)</td><sc-for list="{{fd.chans}}" as="c" hint-placeholder-count="4"><td class="r">{{c.custo}}</td></sc-for></tr>
+            <tr><td class="b">Taxa do app (%)</td><sc-for list="{{fd.chans}}" as="c" hint-placeholder-count="4"><td class="r"><sc-if value="{{c.isApp}}" hint-placeholder-val="{{ false }}"><input class="inp num" value="{{c.taxaStr}}" onChange="{{c.onTaxa}}" placeholder="{{c.taxaPh}}" aria-label="Taxa {{c.nome}}"></sc-if><sc-if value="{{c.notApp}}" hint-placeholder-val="{{ true }}">{{c.taxa}}</sc-if></td></sc-for></tr>
+            <tr><td class="b">PREÇO SUGERIDO (R$)</td><sc-for list="{{fd.chans}}" as="c" hint-placeholder-count="4"><td class="r b">{{c.sug}}</td></sc-for></tr>
+            <tr><td class="b">Preço que você cobra (R$)</td><sc-for list="{{fd.chans}}" as="c" hint-placeholder-count="4"><td class="r"><sc-if value="{{c.isApp}}" hint-placeholder-val="{{ false }}"><input class="inp num" value="{{c.precoStr}}" onChange="{{c.onPreco}}" placeholder="R$" aria-label="Preço {{c.nome}}"></sc-if><sc-if value="{{c.notApp}}" hint-placeholder-val="{{ true }}"><input class="inp num" value="{{c.precoStr}}" readonly aria-label="Preço {{c.nome}}"></sc-if></td></sc-for></tr>
+            <tr><td class="b">Lucro por unidade (R$)</td><sc-for list="{{fd.chans}}" as="c" hint-placeholder-count="4"><td class="r b">{{c.lucro}}</td></sc-for></tr>
+            <tr><td class="b">Situação</td><sc-for list="{{fd.chans}}" as="c" hint-placeholder-count="4"><td class="r"><span class="{{c.stCls}}">{{c.stTxt}}</span></td></sc-for></tr>
+          </tbody>
+        </table></div>
+        <p class="sub" style="font-size: 12px">{{fd.taxaHint}}</p>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2 class="h2">Modo de preparo</h2>
+        <sc-for list="{{fd.prep}}" as="p" hint-placeholder-count="15">
+          <div style="display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: center; padding: 4px 0"><span style="font-weight: 800; color: #5b6676; font-size: 13px">{{p.n}}</span><input class="inp" value="{{p.t}}" onChange="{{p.on}}" aria-label="Passo {{p.n}}"></div>
+        </sc-for>
+      </div>
+      <div class="card">
+        <h2 class="h2">Montagem / observações</h2>
+        <textarea class="inp" style="min-height: 220px; padding: 10px; line-height: 1.5; resize: vertical" onChange="{{fd.onObs}}" aria-label="Montagem e observações" value="{{fd.obs}}"></textarea>
+        <p class="sub" style="font-size: 12px">Esta formulação é de propriedade privada da empresa. Qualquer uso, fotografia, cópia ou similar sem autorização formal e por escrito caracteriza crime de propriedade intelectual.</p>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== MANUAL DE MONTAGEM ===================== -->
+  <sc-if value="{{is.man}}" hint-placeholder-val="{{ false }}">
+  <div class="page">
+    <div class="row">
+      <div>
+        <h1 class="h1">Manual de montagem</h1>
+        <p class="sub">Passo a passo de cada produto, com foto e descrição · imprime em 3 modelos, com a logo da empresa</p>
+      </div>
+      <button class="btn sec" onClick="{{man.novo}}">+ Novo manual</button>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+      <div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 14px">
+        <div class="card" style="padding: 16px">
+          <h2 class="h2">Logo da empresa</h2>
+          <label class="photo" style="min-height: 120px; cursor: pointer; position: relative; padding: 10px">
+            <sc-if value="{{man.hasLogo}}" hint-placeholder-val="{{ false }}"><img src="{{man.logo}}" alt="Logo da empresa" style="max-width: 100%; max-height: 90px; object-fit: contain"><span style="font-size: 11px; font-weight: 500">Clique para trocar</span></sc-if>
+            <sc-if value="{{man.noLogo}}" hint-placeholder-val="{{ true }}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5b6676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg><span>Clique para enviar a logo</span><span style="font-size: 11px; font-weight: 500">Sai em todas as impressões do manual</span></sc-if>
+            <input type="file" accept="image/*" onChange="{{man.onLogo}}" aria-label="Enviar logo da empresa" style="position: absolute; width: 1px; height: 1px; opacity: 0">
+          </label>
+          <label class="fld" style="margin-top: 10px">Nome da empresa<input class="inp" style="min-height: 40px" value="{{man.empresaStr}}" onChange="{{man.onEmpresa}}" placeholder="[Nome do Restaurante]"></label>
+        </div>
+        <div class="card" style="padding: 16px">
+          <h2 class="h2">Produtos</h2>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <sc-for list="{{man.list}}" as="m" hint-placeholder-count="3"><button class="{{m.cls}}" onClick="{{m.pick}}"><span style="flex: 1; text-align: left">{{m.nome}}</span><span class="pill mute">{{m.n}} passos</span></button></sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+        <div class="card">
+          <div class="row" style="align-items: center; margin-bottom: 12px"><h2 class="h2" style="margin: 0">Produto</h2><button class="lnk" style="color: #8f1d1d" onClick="{{man.excluir}}">Excluir este manual</button></div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px">
+            <label class="fld" style="grid-column: span 2">Nome do produto<input class="inp" style="min-height: 44px; font-weight: 700; font-size: 15px" value="{{man.cur.nome}}" onChange="{{man.onNome}}"></label>
+            <label class="fld">Categoria<input class="inp" style="min-height: 44px" value="{{man.cur.cat}}" onChange="{{man.onCat}}" placeholder="Ex.: Burgers"></label>
+            <label class="fld" style="grid-column: span 2">Descrição curta (sai embaixo do nome)<input class="inp" style="min-height: 44px" value="{{man.cur.desc}}" onChange="{{man.onDesc}}" placeholder="Ex.: Pão brioche, 2 carnes 90 g, cheddar"></label>
+            <label class="fld">Padrão / observação<input class="inp" style="min-height: 44px" value="{{man.cur.obs}}" onChange="{{man.onObs}}" placeholder="Ex.: montar em até 2 min"></label>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin-top: 14px; padding-top: 14px; border-top: 1px solid #edf0f4">
+            <label class="fld" style="flex: 1 1 240px">Puxar os passos da ficha técnica<select class="inp" value="{{man.ftSel}}" onChange="{{man.onFtSel}}"><sc-for list="{{man.ftOpts}}" as="o" hint-placeholder-count="2"><option value="{{o.v}}">{{o.label}}</option></sc-for></select></label>
+            <button class="btn sec" onClick="{{man.puxar}}">Puxar ingredientes como passos</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="row" style="align-items: center; margin-bottom: 6px"><h2 class="h2" style="margin: 0">Passo a passo</h2><button class="btn sec" onClick="{{man.addStep}}">+ Adicionar passo</button></div>
+          <p class="sub" style="font-size: 12px; margin: 0 0 6px">Clique no quadro para colocar a foto de cada passo. Use ↑ ↓ para mudar a ordem.</p>
+          <sc-for list="{{man.steps}}" as="s" hint-placeholder-count="5">
+            <div class="mstep">
+              <label class="mphoto">
+                <sc-if value="{{s.hasFoto}}" hint-placeholder-val="{{ false }}"><img src="{{s.foto}}" alt="Foto do passo {{s.n}}"></sc-if>
+                <sc-if value="{{s.noFoto}}" hint-placeholder-val="{{ true }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5b6676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg><span>Foto do passo</span></sc-if>
+                <input type="file" accept="image/*" onChange="{{s.onFoto}}" aria-label="Foto do passo {{s.n}}" style="position: absolute; width: 1px; height: 1px; opacity: 0">
+              </label>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 220px">
+                <div style="display: flex; gap: 8px; align-items: center"><span class="stepn">{{s.n}}</span><input class="inp" style="min-height: 40px; font-weight: 700" value="{{s.titulo}}" onChange="{{s.onTitulo}}" placeholder="Ex.: Pão base" aria-label="Título do passo {{s.n}}"></div>
+                <textarea class="inp" style="min-height: 64px; padding: 8px 10px; resize: vertical; line-height: 1.45" value="{{s.desc}}" onChange="{{s.onDesc}}" placeholder="Como fazer: quantidade, posição, cuidado" aria-label="Descrição do passo {{s.n}}"></textarea>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <button class="ordb" onClick="{{s.up}}" aria-label="Subir passo {{s.n}}">↑</button>
+                <button class="ordb" onClick="{{s.down}}" aria-label="Descer passo {{s.n}}">↓</button>
+                <button class="ordb" style="color: #8f1d1d" onClick="{{s.del}}" aria-label="Excluir passo {{s.n}}">×</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div class="card">
+          <h2 class="h2">Imprimir / gerar PDF</h2>
+          <div class="kl" style="margin-bottom: 8px">1 · Modelos que vão no PDF (pode marcar mais de um)</div>
+          <div class="chips" role="group" aria-label="Modelos"><sc-for list="{{man.modelChips}}" as="o" hint-placeholder-count="4"><button class="{{o.cls}}" onClick="{{o.pick}}">{{o.nome}}</button></sc-for></div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 16px; margin-top: 8px">
+            <sc-for list="{{man.modelList}}" as="o" hint-placeholder-count="4"><div style="font-size: 12px; color: #5b6676"><b style="color: #0b1c30">{{o.nome}}:</b> {{o.desc}}</div></sc-for>
+          </div>
+
+          <sc-if value="{{man.hasCustom}}" hint-placeholder-val="{{ false }}">
+            <div style="background: #f6f8fb; border: 1px solid #dde2ea; border-radius: 12px; padding: 14px; margin-top: 14px">
+              <div class="kl" style="margin-bottom: 10px">Personalizado · escolha do seu jeito</div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; align-items: end">
+                <label class="fld">Estilo<select class="inp" value="{{man.cust.estilo}}" onChange="{{man.onEstilo}}"><option value="painel">Painel (camadas)</option><option value="painelf">Painel com fotos passo a passo</option><option value="ficha">Ficha passo a passo</option><option value="cartao">Cartão de bancada</option></select></label>
+                <label class="fld">Tamanho do papel<select class="inp" value="{{man.cust.papel}}" onChange="{{man.onPapel}}"><option value="a4">A4 (21 × 29,7 cm)</option><option value="a3">A3 (29,7 × 42 cm)</option><option value="a5">A5 (14,8 × 21 cm)</option><option value="carta">Carta (21,6 × 27,9 cm)</option><option value="livre">Tamanho livre (cm)</option></select></label>
+                <sc-if value="{{man.isLivre}}" hint-placeholder-val="{{ false }}">
+                  <label class="fld">Largura (cm)<input class="inp" style="min-height: 44px" value="{{man.cust.w}}" onChange="{{man.onW}}"></label>
+                  <label class="fld">Altura (cm)<input class="inp" style="min-height: 44px" value="{{man.cust.h}}" onChange="{{man.onH}}"></label>
+                </sc-if>
+                <label class="fld">Orientação<select class="inp" value="{{man.cust.orient}}" onChange="{{man.onOrient}}"><option value="retrato">Em pé (retrato)</option><option value="paisagem">Deitado (paisagem)</option></select></label>
+                <label class="fld">Produtos por folha<select class="inp" value="{{man.cust.por}}" onChange="{{man.onPor}}"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="6">6</option><option value="8">8</option></select></label>
+                <label class="fld">Tamanho das fotos<select class="inp" value="{{man.cust.foto}}" onChange="{{man.onFoto}}"><option value="P">Pequena</option><option value="M">Média</option><option value="G">Grande</option></select></label>
+              </div>
+              <p class="sub" style="font-size: 12px">No estilo Ficha sai sempre 1 produto por folha. Em "Tamanho livre", a orientação segue a largura e a altura digitadas.</p>
+            </div>
+          </sc-if>
+
+          <div class="row" style="align-items: center; margin: 16px 0 8px">
+            <div class="kl">2 · Produtos (todos juntos no mesmo PDF)</div>
+            <div style="display: flex; gap: 12px"><button class="lnk" onClick="{{man.todos}}">Marcar todos</button><button class="lnk" onClick="{{man.nenhum}}">Desmarcar</button></div>
+          </div>
+          <div class="chips"><sc-for list="{{man.printChips}}" as="o" hint-placeholder-count="3"><button class="{{o.cls}}" onClick="{{o.pick}}">{{o.nome}}</button></sc-for></div>
+
+          <sc-if value="{{man.hasPainel}}" hint-placeholder-val="{{ true }}">
+            <div class="chips" style="margin-top: 12px"><button class="{{man.invCls}}" onClick="{{man.toggleInv}}">Painel: passo 1 embaixo (montagem de baixo para cima, como lanche)</button></div>
+          </sc-if>
+
+          <div class="cream" style="margin-top: 14px"><b>{{man.resumo}}</b><br>Na janela de impressão, escolha <b>"Salvar como PDF"</b> para gerar um arquivo só com todas as páginas.</div>
+          <div style="margin-top: 14px"><button class="btn" onClick="{{man.openPrint}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>Visualizar PDF</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+</main>
+
+<sc-if value="{{pv.on}}" hint-placeholder-val="{{ false }}">
+<div class="pv" role="dialog" aria-label="Pré-visualização de impressão">
+  <div class="pv-bar">
+    <div><div class="eyebrow">Pré-visualização de impressão</div><div style="font-weight: 700; font-size: 16px">{{pv.titulo}}</div></div>
+    <div style="display: flex; gap: 8px"><button class="btn sec" onClick="{{pv.close}}">Fechar</button><button class="btn" onClick="{{pv.print}}">Imprimir agora</button></div>
+  </div>
+  <sc-if value="{{pv.notMan}}" hint-placeholder-val="{{ true }}"><div class="sheet">
+    <sc-if value="{{pv.notMan}}" hint-placeholder-val="{{ true }}"><div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 16px; font-size: 11px; color: #6b7280; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase"><span>JG Consultoria · Controle de Estoque &amp; CMV</span><span>{{cfg.nome}}</span></div></sc-if>
+    <sc-if value="{{pv.isFt}}" hint-placeholder-val="{{ false }}">
+      <div class="eyebrow" style="color: #16324f">Ficha técnica · {{fd.num}} · Padrão de produção</div>
+      <h3>{{fd.nome}}</h3>
+      <div class="meta"><span>Categoria: <b>{{fd.cat}}</b></span><span>Rendimento: <b>{{fd.rend}} porção(ões)</b></span><span>Peso final: <b>{{fd.peso}} g</b></span><span>Última revisão: <b>{{fd.rev}}</b></span></div>
+      <div style="margin-top: 14px">
+        <sc-if value="{{fd.hasFoto}}" hint-placeholder-val="{{ false }}"><img src="{{fd.foto}}" alt="Foto do prato" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: 6px; display: block"></sc-if>
+        <sc-if value="{{fd.noFoto}}" hint-placeholder-val="{{ true }}"><div style="height: 170px; border: 1px dashed #9ca3af; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 12px">Foto do prato (envie na ficha para sair aqui)</div></sc-if>
+      </div>
+      <div class="sh">Ingredientes</div>
+      <table><thead><tr><th>#</th><th>Insumo</th><th>Unid</th><th class="r">Qtde (g / ml / und)</th><th class="r">Custo</th></tr></thead>
+        <tbody><sc-for list="{{pv.ings}}" as="i" hint-placeholder-count="7"><tr><td>{{i.n}}</td><td>{{i.label}}</td><td>{{i.un}}</td><td class="r">{{i.q}}</td><td class="r">{{i.custo}}</td></tr></sc-for></tbody></table>
+      <div class="sh">Embalagem — retirada e delivery</div>
+      <table><thead><tr><th>#</th><th>Embalagem</th><th class="r">Qtde</th><th class="r">Custo</th></tr></thead>
+        <tbody><sc-for list="{{pv.embs}}" as="i" hint-placeholder-count="3"><tr><td>{{i.n}}</td><td>{{i.label}}</td><td class="r">{{i.q}}</td><td class="r">{{i.custo}}</td></tr></sc-for></tbody></table>
+      <div class="sh">Custo e preço</div>
+      <table><tbody>
+        <tr><td>Custo total da receita</td><td class="r"><b>{{fd.total}}</b></td><td>Custo por porção</td><td class="r"><b>{{fd.porc}}</b></td></tr>
+        <tr><td>Preço de venda salão</td><td class="r"><b>{{fd.precoTxt}}</b></td><td>CMV real</td><td class="r"><b>{{fd.cmv}}</b> (meta {{fd.meta}})</td></tr>
+        <tr><td>Lucro por porção</td><td class="r"><b>{{fd.lucro}}</b></td><td>Markup</td><td class="r"><b>{{fd.markup}}</b></td></tr>
+      </tbody></table>
+      <div class="sh">Preço por canal · 1 unidade</div>
+      <table><thead><tr><th>Canal</th><th class="r">Custo</th><th class="r">Taxa</th><th class="r">Sugerido</th><th class="r">Preço</th><th class="r">Lucro</th><th>Situação</th></tr></thead>
+        <tbody><sc-for list="{{pv.chans}}" as="c" hint-placeholder-count="4"><tr><td><b>{{c.nome}}</b></td><td class="r">{{c.custo}}</td><td class="r">{{c.taxa}}</td><td class="r">{{c.sug}}</td><td class="r">{{c.preco}}</td><td class="r">{{c.lucro}}</td><td>{{c.stTxt}}</td></tr></sc-for></tbody></table>
+      <div class="sh">Modo de preparo</div>
+      <ol style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.8"><sc-for list="{{pv.prep}}" as="p" hint-placeholder-count="5"><li>{{p.t}}</li></sc-for></ol>
+      <div class="sh">Montagem / observações</div>
+      <p style="font-size: 13px; margin: 0; min-height: 40px">{{fd.obs}}</p>
+      <div style="display: flex; justify-content: space-between; margin-top: 28px; font-size: 12px; color: #6b7280"><span>Responsável: ______________________</span><span>Visto: ____________</span></div>
+    </sc-if>
+    <sc-if value="{{pv.isCmv}}" hint-placeholder-val="{{ false }}">
+      <div class="eyebrow" style="color: #16324f">Controle de CMV</div>
+      <h3>CMV — {{cw.nome}}</h3>
+      <div class="meta"><span>Contagem inicial: <b>{{cw.dIni}}</b></span><span>Contagem final: <b>{{cw.dFim}}</b></span><span>Faturamento: <b>R$ {{cw.fatStr}}</b></span><span><b>{{cw.metaTxt}}</b></span></div>
+      <p style="font-size: 12px; color: #374151; margin: 8px 0 0">{{cw.periodo}}</p>
+      <div class="sh">Resultado da semana</div>
+      <table><tbody>
+        <tr><td>CMV real</td><td class="r"><b>{{cw.cmvTxt}}</b></td><td>CMV x meta</td><td class="r"><b>{{cw.diff}}</b></td></tr>
+        <tr><td>Utilizado CMV</td><td class="r"><b>{{cw.utilCmv}}</b></td><td>Utilizado total</td><td class="r"><b>{{cw.utilTot}}</b></td></tr>
+        <tr><td>(+) Estoque inicial</td><td class="r">{{cw.rIni}}</td><td>(+) Entradas</td><td class="r">{{cw.rEnt}}</td></tr>
+        <tr><td>(+) Produção</td><td class="r">{{cw.rProd}}</td><td>(−) Estoque final</td><td class="r">{{cw.rFin}}</td></tr>
+        <tr><td>(!) Perdas</td><td class="r">{{cw.perdas}}</td><td>% perda</td><td class="r">{{cw.perdaPct}}</td></tr>
+      </tbody></table>
+      <div class="sh">Itens · {{ordNome}}</div>
+      <table><thead><tr><th>Produto</th><th>Unid</th><th class="r">Est. inicial</th><th class="r">Entradas</th><th class="r">Produção</th><th class="r">Est. final</th><th class="r">Utilizado</th><th class="r">R$ utilizado</th></tr></thead>
+        <sc-for list="{{cw.groups}}" as="g" hint-placeholder-count="1"><tbody>
+          <sc-if value="{{g.hdr}}" hint-placeholder-val="{{ false }}"><tr><td colspan="8" class="grow">{{g.nome}} · {{g.n}} itens</td></tr></sc-if>
+          <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="12"><tr><td>{{r.nome}}</td><td>{{r.un}}</td><td class="r">{{r.iniTxt}}</td><td class="r">{{r.ent}}</td><td class="r">{{r.prod}}</td><td class="r">{{r.finTxt}}</td><td class="r">{{r.uso}}</td><td class="r">{{r.rs}}</td></tr></sc-for>
+        </tbody></sc-for>
+      </table>
+      <div style="display: flex; justify-content: space-between; margin-top: 28px; font-size: 12px; color: #6b7280"><span>Responsável pela contagem: ______________________</span><span>Visto do gestor: ____________</span></div>
+    </sc-if>
+    <sc-if value="{{pv.isFech}}" hint-placeholder-val="{{ false }}">
+      <div class="eyebrow" style="color: #16324f">Fechamento do mês</div>
+      <h3>{{mes.ref}}</h3>
+      <div class="meta"><span>Faturamento: <b>{{mes.fat}}</b></span><span>CMV do mês: <b>{{mes.cmv}}</b> (meta {{mes.meta}})</span><span>Situação: <b>{{mes.stTxt}}</b></span></div>
+      <div class="sh">Resultado do mês</div>
+      <table><tbody>
+        <tr><td>Utilizado CMV</td><td class="r"><b>{{mes.util}}</b></td><td>Uso total</td><td class="r">{{mes.utilTot}}</td></tr>
+        <tr><td>Perdas do mês</td><td class="r">{{mes.perdas}} ({{mes.perdaPct}} do utilizado)</td><td>Produção do mês</td><td class="r">{{mes.prod}}</td></tr>
+        <tr><td>CMV x meta</td><td class="r">{{mes.diff}}</td><td>Lançamentos de produção</td><td class="r">{{mes.prodN}}</td></tr>
+      </tbody></table>
+      <div class="sh">Semana a semana</div>
+      <table><thead><tr><th>Semana</th><th>Início</th><th>Fim</th><th class="r">Faturamento</th><th class="r">Utilizado CMV</th><th class="r">CMV %</th><th>Status</th><th class="r">Perdas</th><th class="r">Produção</th></tr></thead>
+        <tbody><sc-for list="{{weeks}}" as="w" hint-placeholder-count="5"><tr><td>{{w.nome}}</td><td>{{w.dIni}}</td><td>{{w.dFim}}</td><td class="r">{{w.fat}}</td><td class="r">{{w.util}}</td><td class="r"><b>{{w.cmv}}</b></td><td>{{w.stTxt}}</td><td class="r">{{w.perdas}}</td><td class="r">{{w.prod}}</td></tr></sc-for></tbody></table>
+      <div class="sh">Gasto por categoria</div>
+      <table><thead><tr><th>Categoria</th><th class="r">R$ utilizado</th><th class="r">% total</th></tr></thead>
+        <tbody><sc-for list="{{mes.cats}}" as="c" hint-placeholder-count="6"><tr><td>{{c.nome}}</td><td class="r">{{c.rs}}</td><td class="r">{{c.pct}}</td></tr></sc-for></tbody></table>
+      <div class="sh">Perdas por motivo</div>
+      <table><thead><tr><th>Motivo</th><th class="r">R$ perdido</th><th class="r">% perdas</th></tr></thead>
+        <tbody><sc-for list="{{motSem}}" as="m" hint-placeholder-count="6"><tr><td>{{m.nome}}</td><td class="r">{{m.tot}}</td><td class="r">{{m.pct}}</td></tr></sc-for></tbody></table>
+      <div class="sh">Top 10 — onde mais foi dinheiro</div>
+      <table><thead><tr><th>Produto</th><th class="r">R$ utilizado</th><th class="r">% do uso total</th></tr></thead>
+        <tbody><sc-for list="{{mes.top10}}" as="t" hint-placeholder-count="10"><tr><td>{{t.nome}}</td><td class="r">{{t.rs}}</td><td class="r">{{t.pct}}</td></tr></sc-for></tbody></table>
+      <div style="display: flex; justify-content: space-between; margin-top: 28px; font-size: 12px; color: #6b7280"><span>Responsável: ______________________</span><span>Visto do gestor: ____________</span></div>
+    </sc-if>
+    <sc-if value="{{pv.isCompras}}" hint-placeholder-val="{{ false }}">
+      <div class="eyebrow" style="color: #16324f">Estoque mínimo</div>
+      <h3>Lista de compras</h3>
+      <div class="meta"><span>Data: <b>{{pv.hoje}}</b></span><span>Itens: <b>{{est.nComprar}}</b></span><span>Compra sugerida: <b>{{pv.comprasTot}}</b></span></div>
+      <div class="sh">Itens com estoque atual ≤ mínimo · quantidade para voltar ao estoque ideal</div>
+      <table><thead><tr><th>Produto</th><th>Unid</th><th>Categoria</th><th class="r">Estoque atual</th><th class="r">Mínimo</th><th class="r">Comprar</th><th class="r">R$ estimado</th><th style="width: 90px">Comprado</th></tr></thead>
+        <tbody><sc-for list="{{pv.compras}}" as="c" hint-placeholder-count="8"><tr><td>{{c.nome}}</td><td>{{c.un}}</td><td>{{c.cat}}</td><td class="r">{{c.atual}}</td><td class="r">{{c.min}}</td><td class="r"><b>{{c.sug}}</b></td><td class="r">{{c.rs}}</td><td style="border-bottom: 1px solid #9ca3af"></td></tr></sc-for></tbody></table>
+    </sc-if>
+    <sc-if value="{{pv.isLista}}" hint-placeholder-val="{{ false }}">
+      <h3>Contagem de estoque</h3>
+      <div class="meta"><span>Data: ____/____/________</span><span>Resp.: ______________________________</span></div>
+      <div class="sh">{{pv.nLista}} itens · {{ordNome}}</div>
+      <table><thead><tr><th>Nº</th><th>Produto</th><th>Unid</th><th style="width: 120px">Qtde em estoque</th><th style="width: 200px">Observação</th></tr></thead>
+        <sc-for list="{{listaG}}" as="g" hint-placeholder-count="1"><tbody>
+  <sc-if value="{{g.hdr}}" hint-placeholder-val="{{ false }}"><tr><td colspan="5" class="grow">{{g.nome}} · {{g.n}} itens</td></tr></sc-if>
+  <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="12"><tr><td>{{r.n}}</td><td>{{r.nome}}</td><td>{{r.un}}</td><td style="border-bottom: 1px solid #9ca3af"></td><td></td></tr></sc-for>
+</tbody></sc-for></table>
+    </sc-if>
+    <div style="margin-top: 22px; padding-top: 10px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; gap: 12px"><span style="font-size: 10px; color: #6b7280">Método desenvolvido por João Gustavo Consultoria Empresarial · Food Service</span><img src="/_blob/983c1ce21e2d68ab9d4c480ec8bafaad" alt="João Gustavo Consultoria" style="height: 26px; width: auto"></div>
+  </div></sc-if>
+  <sc-if value="{{pv.isMan}}" hint-placeholder-val="{{ false }}">
+  <style>{{man.pageCss}}</style>
+  <div class="pv-info">{{man.resumo}} Na janela de impressão, escolha "Salvar como PDF".</div>
+  <div style="display: flex; flex-direction: column; gap: 22px; align-items: center; width: 100%">
+  <sc-for list="{{man.pages}}" as="pg" hint-placeholder-count="1">
+    <div class="{{pg.cls}}" style="max-width: {{pg.maxw}}px; aspect-ratio: {{pg.ar}}">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; border-bottom: 3px solid #0b1c30; padding-bottom: 10px; margin-bottom: 14px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <sc-if value="{{man.hasLogo}}" hint-placeholder-val="{{ false }}"><img src="{{man.logo}}" alt="Logo" style="height: 44px; max-width: 170px; object-fit: contain"></sc-if>
+          <div><div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px; color: #0b1c30">{{man.empresa}}</div><div class="eyebrow" style="color: #16324f">Manual de montagem</div></div>
+        </div>
+        <div style="font-size: 10.5px; color: #6b7280; text-align: right">{{pg.modelo}}<br>{{pg.label}} · impresso em {{man.rev}}</div>
+      </div>
+
+      <sc-if value="{{pg.isPainel}}" hint-placeholder-val="{{ false }}">
+        <div style="display: grid; grid-template-columns: {{pg.gcols}}; gap: 12px">
+          <sc-for list="{{pg.items}}" as="m" hint-placeholder-count="4">
+            <div style="border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden; display: flex; flex-direction: column">
+              <div style="background: #0b1c30; color: #ffffff; text-align: center; padding: 8px 6px; font-weight: 800; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.04em">{{m.nome}}</div>
+              <div style="font-size: 10.5px; color: #374151; padding: 6px 8px; text-align: center; min-height: 30px; line-height: 1.35">{{m.desc}}</div>
+              <div style="display: flex; flex-direction: column; gap: 3px; padding: 4px 8px 8px; flex: 1">
+                <sc-for list="{{m.layers}}" as="l" hint-placeholder-count="6">
+                  <div style="display: flex; align-items: center; gap: 6px">
+                    <span style="width: 18px; height: 18px; border-radius: 9px; background: #0b1c30; color: #ffffff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: none">{{l.n}}</span>
+                    <sc-if value="{{l.hasFoto}}" hint-placeholder-val="{{ false }}"><img src="{{l.foto}}" alt="{{l.titulo}}" style="height: {{pg.fh}}px; width: auto; max-width: 60%; object-fit: contain"><span style="font-size: 10px; font-weight: 600; color: #1f2a3a; flex: 1">{{l.titulo}}</span></sc-if>
+                    <sc-if value="{{l.noFoto}}" hint-placeholder-val="{{ true }}"><div style="flex: 1; min-height: {{pg.fh}}px; border-radius: 5px; background: #eef1f5; border: 1px solid #d5dde8; display: flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 600; color: #1f2a3a; text-align: center; padding: 2px 4px">{{l.titulo}}</div></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font-size: 10px; color: #4b5563; padding: 6px 8px; border-top: 1px solid #e5e7eb; text-align: center">{{m.obs}}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{pg.isPainelF}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 14px">
+          <sc-for list="{{pg.items}}" as="m" hint-placeholder-count="3">
+            <div style="border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden; display: flex; flex-direction: column">
+              <div style="background: #0b1c30; color: #ffffff; padding: 7px 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap"><b style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em">{{m.nome}}</b><span style="font-size: 10.5px; opacity: 0.85">{{m.desc}}</span></div>
+              <div style="display: flex; gap: 6px; padding: 8px; align-items: stretch">
+                <sc-for list="{{m.steps}}" as="s" hint-placeholder-count="6">
+                  <div style="flex: 1 1 0; min-width: 0; border: 1px solid #e5e7eb; border-radius: 5px; overflow: hidden">
+                    <sc-if value="{{s.hasFoto}}" hint-placeholder-val="{{ false }}"><img src="{{s.foto}}" alt="Passo {{s.n}}" style="width: 100%; height: {{pg.fh}}px; object-fit: cover; display: block"></sc-if>
+                    <sc-if value="{{s.noFoto}}" hint-placeholder-val="{{ true }}"><div style="height: {{pg.fh}}px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #6b7280">Foto do passo</div></sc-if>
+                    <div style="padding: 5px 7px">
+                      <div style="display: flex; align-items: center; gap: 6px"><span style="width: 18px; height: 18px; border-radius: 9px; background: #0b1c30; color: #ffffff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: none">{{s.n}}</span><b style="font-size: 11.5px">{{s.titulo}}</b></div>
+                      <div style="font-size: 10.5px; color: #374151; margin-top: 3px; line-height: 1.35">{{s.desc}}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font-size: 10px; color: #4b5563; padding: 6px 8px; border-top: 1px solid #e5e7eb; text-align: center"><b>Padrão:</b> {{m.obs}}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{pg.isFicha}}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{pg.items}}" as="m" hint-placeholder-count="1">
+          <h3>{{m.nome}}</h3>
+          <div class="meta"><span>Categoria: <b>{{m.cat}}</b></span><span>{{m.desc}}</span></div>
+          <div class="sh">Passo a passo</div>
+          <div style="display: grid; grid-template-columns: {{pg.scols}}; gap: 12px">
+            <sc-for list="{{m.steps}}" as="s" hint-placeholder-count="6">
+              <div style="border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden">
+                <sc-if value="{{s.hasFoto}}" hint-placeholder-val="{{ false }}"><img src="{{s.foto}}" alt="Passo {{s.n}}" style="width: 100%; height: {{pg.fh}}px; object-fit: cover; display: block"></sc-if>
+                <sc-if value="{{s.noFoto}}" hint-placeholder-val="{{ true }}"><div style="height: {{pg.fh}}px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #6b7280">Foto do passo</div></sc-if>
+                <div style="padding: 8px 10px">
+                  <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: #16324f">PASSO {{s.n}}</div>
+                  <div style="font-weight: 800; font-size: 13px; margin-top: 2px">{{s.titulo}}</div>
+                  <div style="font-size: 11.5px; color: #374151; margin-top: 4px; line-height: 1.4">{{s.desc}}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top: 14px; border: 1px solid #d1d5db; border-radius: 6px; padding: 10px 12px; font-size: 12px; background: #f8f9fb"><b>Padrão:</b> {{m.obs}}</div>
+          <div style="display: flex; justify-content: space-between; margin-top: 22px; font-size: 12px; color: #6b7280"><span>Responsável: ______________________</span><span>Visto: ____________</span></div>
+        </sc-for>
+      </sc-if>
+
+      <sc-if value="{{pg.isCartao}}" hint-placeholder-val="{{ false }}">
+        <div style="display: grid; grid-template-columns: {{pg.gcols}}; gap: 14px">
+          <sc-for list="{{pg.items}}" as="m" hint-placeholder-count="2">
+            <div style="border: 2px solid #0b1c30; border-radius: 8px; overflow: hidden">
+              <div style="background: #0b1c30; color: #ffffff; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px"><b style="text-transform: uppercase; font-size: 13px; letter-spacing: 0.04em">{{m.nome}}</b><span style="font-size: 10px; opacity: 0.8">{{m.cat}}</span></div>
+              <div style="padding: 8px 12px; display: flex; flex-direction: column; gap: 6px">
+                <sc-for list="{{m.steps}}" as="s" hint-placeholder-count="6">
+                  <div style="display: flex; gap: 8px; align-items: center; font-size: 11.5px; border-bottom: 1px dashed #e5e7eb; padding-bottom: 5px">
+                    <span style="width: 20px; height: 20px; border-radius: 10px; background: #0b1c30; color: #ffffff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: none">{{s.n}}</span>
+                    <sc-if value="{{s.hasFoto}}" hint-placeholder-val="{{ false }}"><img src="{{s.foto}}" alt="" style="width: {{pg.fh}}px; height: {{pg.fh}}px; object-fit: cover; border-radius: 4px; flex: none"></sc-if>
+                    <div><b>{{s.titulo}}</b> <span style="color: #4b5563">{{s.desc}}</span></div>
+                  </div>
+                </sc-for>
+                <div style="font-size: 10.5px; color: #374151; padding-top: 2px"><b>Padrão:</b> {{m.obs}}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="margin-top: 22px; padding-top: 10px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; gap: 12px"><span style="font-size: 10px; color: #6b7280">Método desenvolvido por João Gustavo Consultoria Empresarial · Food Service</span><img src="/_blob/983c1ce21e2d68ab9d4c480ec8bafaad" alt="João Gustavo Consultoria" style="height: 26px; width: auto"></div>
+    </div>
+  </sc-for>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{toast.on}}" hint-placeholder-val="{{ false }}"><div class="toast" role="status"><span class="ic">✓</span><div>{{toast.msg}}</div></div></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1180}}'>
+/*LOGICA*/
+</script>
+</body>
+</html>

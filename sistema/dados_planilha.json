@@ -1,0 +1,879 @@
+{
+ "origem": "CONTROLE_DE_ESTOQUE_E_CMV_-_JG_CONSULTORIA_v12.1.xlsx",
+ "cfg": {
+  "mes": "Outubro 2026",
+  "metaMes": 0.35,
+  "metaCmc": 0.35,
+  "est": {
+   "dias": 7,
+   "prazo": 2,
+   "margem": 0.2,
+   "cob": 7
+  },
+  "apps": [
+   {
+    "nome": "iFood",
+    "com": 0.23,
+    "pag": 0.032
+   },
+   {
+    "nome": "",
+    "com": null,
+    "pag": null
+   }
+  ],
+  "embCat": "Embalagem"
+ },
+ "cats": [
+  {
+   "nome": "Insumos CMV",
+   "cmv": true
+  },
+  {
+   "nome": "Embalagem",
+   "cmv": false
+  },
+  {
+   "nome": "Limpeza",
+   "cmv": false
+  },
+  {
+   "nome": "Operacional",
+   "cmv": false
+  },
+  {
+   "nome": "Consumo",
+   "cmv": false
+  },
+  {
+   "nome": "Outros",
+   "cmv": false
+  }
+ ],
+ "ins": [
+  {
+   "cod": "001",
+   "nome": "Brócolis",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "002",
+   "nome": "Grão de bico",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "003",
+   "nome": "Morango",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "004",
+   "nome": "Rúcula",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "005",
+   "nome": "Abacate",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "006",
+   "nome": "Tomate cereja",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "007",
+   "nome": "Cebola Roxa",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "008",
+   "nome": "Suco manga c/ maracujá",
+   "un": "und",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "009",
+   "nome": "Suco laranja",
+   "un": "und",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "010",
+   "nome": "Edamame",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "011",
+   "nome": "Tomate",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "012",
+   "nome": "Milho",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "013",
+   "nome": "Sunomono de beterraba",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "014",
+   "nome": "Repolho roxo",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "015",
+   "nome": "Pimenta biquinho",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "016",
+   "nome": "Gengibre",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "017",
+   "nome": "Sunomono",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "018",
+   "nome": "Abacaxi",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "019",
+   "nome": "Cani",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "020",
+   "nome": "Picles",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "021",
+   "nome": "Cenoura",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "022",
+   "nome": "Salada tropical",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "023",
+   "nome": "Manga",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "024",
+   "nome": "Abacaxi agridoce",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "025",
+   "nome": "Arroz integral",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "026",
+   "nome": "Guacamole",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "027",
+   "nome": "Suco açaí c/ morango",
+   "un": "und",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Sim"
+  },
+  {
+   "cod": "028",
+   "nome": "Salmão batido",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "029",
+   "nome": "Abacaxi grelhado",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "030",
+   "nome": "Kani",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "031",
+   "nome": "Salmão grelhado",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "032",
+   "nome": "Ceviche tropical",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "033",
+   "nome": "Salmão cozido",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "034",
+   "nome": "Ceviche tilápia",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "035",
+   "nome": "Ceviche salmão",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "036",
+   "nome": "Cream cheese",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "037",
+   "nome": "Alface",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "038",
+   "nome": "Camarão cozido",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "039",
+   "nome": "Suco açaí",
+   "un": "und",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "040",
+   "nome": "Oniguiri",
+   "un": "und",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "041",
+   "nome": "Poke M",
+   "un": "und",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "042",
+   "nome": "Wakami",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "043",
+   "nome": "Folhas",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "044",
+   "nome": "Suco verde",
+   "un": "und",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  },
+  {
+   "cod": "045",
+   "nome": "Salmão empanado",
+   "un": "kg",
+   "rende": "1",
+   "compra": "",
+   "cat": "Insumos CMV",
+   "naCont": "Não"
+  }
+ ],
+ "weeks": [
+  {
+   "ini": "",
+   "fim": "",
+   "fat": "",
+   "meta": 0.35,
+   "rows": {}
+  },
+  {
+   "ini": "",
+   "fim": "",
+   "fat": "",
+   "meta": 0.35,
+   "rows": {}
+  },
+  {
+   "ini": "",
+   "fim": "",
+   "fat": "",
+   "meta": 0.35,
+   "rows": {}
+  },
+  {
+   "ini": "",
+   "fim": "",
+   "fat": "",
+   "meta": 0.35,
+   "rows": {}
+  },
+  {
+   "ini": "",
+   "fim": "",
+   "fat": "",
+   "meta": 0.35,
+   "rows": {}
+  }
+ ],
+ "lanc": [],
+ "perd": [],
+ "notas": [],
+ "prazo": {},
+ "fichas": [
+  {
+   "nome": "Poke de Salmão (exemplo)",
+   "cat": "Pokes",
+   "rev": "",
+   "rend": "1",
+   "peso": "",
+   "preco": "39,9",
+   "meta": 0.3,
+   "ings": [
+    {
+     "cod": "025",
+     "q": "150"
+    },
+    {
+     "cod": "031",
+     "q": "100"
+    },
+    {
+     "cod": "010",
+     "q": "30"
+    },
+    {
+     "cod": "023",
+     "q": "40"
+    },
+    {
+     "cod": "036",
+     "q": "20"
+    },
+    {
+     "cod": "015",
+     "q": "5"
+    },
+    {
+     "cod": "042",
+     "q": "15"
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    }
+   ],
+   "embs": [
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    }
+   ],
+   "taxa": [
+    "",
+    ""
+   ],
+   "precoApp": [
+    "",
+    ""
+   ],
+   "prep": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ],
+   "obs": ""
+  },
+  {
+   "nome": "Combo Casal (exemplo)",
+   "cat": "Combos",
+   "rev": "",
+   "rend": "1",
+   "peso": "",
+   "preco": "79,9",
+   "meta": 0.3,
+   "ings": [
+    {
+     "cod": "031",
+     "q": "200"
+    },
+    {
+     "cod": "025",
+     "q": "300"
+    },
+    {
+     "cod": "026",
+     "q": "60"
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    }
+   ],
+   "embs": [
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    },
+    {
+     "cod": "",
+     "q": ""
+    }
+   ],
+   "taxa": [
+    "",
+    ""
+   ],
+   "precoApp": [
+    "",
+    ""
+   ],
+   "prep": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ],
+   "obs": ""
+  },
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null
+ ]
+}
